@@ -1,6 +1,5 @@
 defmodule Slacktappdex.API.Untappd do
   def get(path) do
-    IO.puts api_url path
     HTTPotion.get(api_url(path))
   end
 
