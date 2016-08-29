@@ -1,3 +1,5 @@
 use Mix.Config
 
-config :slacktappdex, :api, Slacktappdex.API.Mock
+config :mix_test_watch, clear: true
+config :slacktappdex, :slack, Slacktappdex.Slack.Mock
+config :slacktappdex, :untappd, Slacktappdex.Untappd.Mock

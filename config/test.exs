@@ -1,3 +1,4 @@
 use Mix.Config
 
-config :slacktappdex, :api, Slacktappdex.API.Mock
+config :slacktappdex, :slack, Slacktappdex.Slack.Mock
+config :slacktappdex, :untappd, Slacktappdex.Untappd.Mock

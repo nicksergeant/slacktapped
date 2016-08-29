@@ -21,7 +21,9 @@ defmodule Slacktappdex.Mixfile do
 
   defp deps do
     [
-      {:httpotion, "~> 3.0.0"}
+      {:httpotion, "~> 3.0.0"},
+      {:mix_test_watch, "~> 0.2", only: :dev},
+      {:poison, "~> 2.0"}
     ]
   end
 end

@@ -1,3 +1,4 @@
 use Mix.Config
 
-config :slacktappdex, :api, Slacktappdex.API.Untappd
+config :slacktappdex, :Slack, Slacktappdex.Slack.Live
+config :slacktappdex, :Untappd, Slacktappdex.Untappd.Live
