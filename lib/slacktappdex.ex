@@ -29,25 +29,26 @@ defmodule Slacktappdex do
   ## Examples
 
       iex> checkin = %{
-      iex>   "user" => %{
-      iex>     "user_name" => "nicksergeant"
-      iex>   }
-      iex> }
+      ...>   "user" => %{
+      ...>     "user_name" => "nicksergeant"
+      ...>   }
+      ...> }
       iex> Slacktappdex.parse_checkin(checkin)
-      "nicksergeant is drinking"
+      "<a href=\"https://untappd.com/user/nicksergeant\">nicksergeant</a> is drinking"
 
   """
   def parse_checkin(checkin) do
     # TODO: If checkin description has #shh in it, ignore.
     # TODO: Post image if we haven't already, even if checkin already.
 
-    username = get_in(checkin, ["user", "user_name"])
+    username = parse_username(checkin["user"])
+    user = "<a href=\"https://untappd.com/user/#{username}\">#{username}</a>"
 
     # """
     #   #{username} is drinking #{beer_name} (#{beer_type}, #{abv} ABV)
     #   by #{brewery}. They rated it a #{rating} and said \"#{comment}\".
     # """
-    "#{username} is drinking"
+    "#{user} is drinking"
   end
 
   def parse_comment(comment) do
@@ -61,23 +62,23 @@ defmodule Slacktappdex do
   ## Examples
 
       iex> user = %{
-      iex>   "user_name" => "nicksergeant"
-      iex> }
+      ...>   "user_name" => "nicksergeant"
+      ...> }
       iex> Slacktappdex.parse_username(user)
       "nicksergeant"
 
       iex> user = %{
-      iex>   "user_name" => "nicksergeant",
-      iex>   "first_name" => "Nick",
-      iex>   "last_name" => "Sergeant"
-      iex> }
+      ...>   "user_name" => "nicksergeant",
+      ...>   "first_name" => "Nick",
+      ...>   "last_name" => "Sergeant"
+      ...> }
       iex> Slacktappdex.parse_username(user)
       "Nick Sergeant"
 
       iex> user = %{
-      iex>   "user_name" => "nicksergeant",
-      iex>   "first_name" => "Nick"
-      iex> }
+      ...>   "user_name" => "nicksergeant",
+      ...>   "first_name" => "Nick"
+      ...> }
       iex> Slacktappdex.parse_username(user)
       "nicksergeant"
 
