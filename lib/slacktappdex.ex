@@ -23,67 +23,81 @@ defmodule Slacktappdex do
     "badge"
   end
 
-  @doc """
-  Parses a checkin map to a string for Slack.
+  @doc ~S"""
+  Parses a checkin to a string for Slack.
 
   ## Examples
 
-      iex> checkin = %{
+  A normal checkin:
+
+      iex> Slacktappdex.parse_checkin(%{
       ...>   "user" => %{
       ...>     "user_name" => "nicksergeant"
+      ...>   },
+      ...>   "beer" => %{
+      ...>     "bid" => 123,
+      ...>     "beer_name" => "IPA",
+      ...>     "beer_slug" => "two-lake-ipa"
       ...>   }
-      ...> }
-      iex> Slacktappdex.parse_checkin(checkin)
-      "<a href=\"https://untappd.com/user/nicksergeant\">nicksergeant</a> is drinking"
+      ...> })
+      "<a href=\"https://untappd.com/user/nicksergeant\">nicksergeant</a> " <>
+      "is drinking " <>
+      "<a href=\"https://untappd.com/b/two-lake-ipa/123\">IPA</a>"
 
   """
   def parse_checkin(checkin) do
-    # TODO: If checkin description has #shh in it, ignore.
-    # TODO: Post image if we haven't already, even if checkin already.
+    user_name = parse_name(checkin["user"])
+    user_username = checkin["user"]["user_name"]
+    user = "<a href=\"https://untappd.com/user/#{user_username}\">" <>
+      "#{user_name}</a>"
 
-    username = parse_username(checkin["user"])
-    user = "<a href=\"https://untappd.com/user/#{username}\">#{username}</a>"
+    beer_id = checkin["beer"]["bid"]
+    beer_name = checkin["beer"]["beer_name"]
+    beer_slug = checkin["beer"]["beer_slug"]
+    beer = "<a href=\"https://untappd.com/b/#{beer_slug}/#{beer_id}\">" <>
+      "#{beer_name}</a>"
 
     # """
     #   #{username} is drinking #{beer_name} (#{beer_type}, #{abv} ABV)
     #   by #{brewery}. They rated it a #{rating} and said \"#{comment}\".
     # """
-    "#{user} is drinking"
+    "#{user} is drinking #{beer}"
   end
 
   def parse_comment(comment) do
     "comment"
   end
 
+  defp drop_if_shushed(checkin) do
+
+  end
+
   @doc """
-  Returns the user's name. If both first and last name are present, it returns
-  "First-name Last-name", otherwise it returns "username".
+  Returns the user's name. If both first and last name are present, returns
+  "First-name Last-name", otherwise returns "username".
 
   ## Examples
 
-      iex> user = %{
+      iex> Slacktappdex.parse_name(%{
       ...>   "user_name" => "nicksergeant"
-      ...> }
-      iex> Slacktappdex.parse_username(user)
+      ...> })
       "nicksergeant"
 
-      iex> user = %{
+      iex> Slacktappdex.parse_name(%{
       ...>   "user_name" => "nicksergeant",
       ...>   "first_name" => "Nick",
       ...>   "last_name" => "Sergeant"
-      ...> }
-      iex> Slacktappdex.parse_username(user)
+      ...> })
       "Nick Sergeant"
 
-      iex> user = %{
+      iex> Slacktappdex.parse_name(%{
       ...>   "user_name" => "nicksergeant",
       ...>   "first_name" => "Nick"
-      ...> }
-      iex> Slacktappdex.parse_username(user)
+      ...> })
       "nicksergeant"
 
   """
-  def parse_username(user) do
+  defp parse_name(user) do
     case user do
       %{
         "first_name" => first_name,
@@ -100,7 +114,10 @@ defmodule Slacktappdex do
   end
 
   defp process_checkin(checkin) do
-    parse_checkin(checkin) |> @slack.post
+    checkin
+      |> drop_if_shushed
+      |> parse_checkin
+      |> @slack.post
     checkin
   end
 
