@@ -2,7 +2,7 @@ defmodule Slacktappdex do
   @slack Application.get_env(:slacktappdex, :slack)
   @untappd Application.get_env(:slacktappdex, :untappd)
 
-  def main() do
+  def main do
     checkins
       |> Enum.each(fn(checkin) ->
         checkin
@@ -12,7 +12,7 @@ defmodule Slacktappdex do
       end)
   end
 
-  def checkins() do
+  def checkins do
     @untappd.get("checkin/recent")
      |> Map.fetch!(:body)
      |> Poison.decode!
