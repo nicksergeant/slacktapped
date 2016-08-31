@@ -10,5 +10,7 @@ defmodule Slacktappdex.Slack.Live do
       }),
       headers: ["Content-Type": "application/json"]
     ])
+
+    {:ok, message}
   end
 end

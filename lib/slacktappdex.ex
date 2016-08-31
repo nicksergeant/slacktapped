@@ -40,13 +40,20 @@ defmodule Slacktappdex do
       ...>     "beer_slug" => "two-lake-ipa"
       ...>   }
       ...> })
-      "<a href=\"https://untappd.com/user/nicksergeant\">nicksergeant</a> " <>
-      "is drinking " <>
-      "<a href=\"https://untappd.com/b/two-lake-ipa/123\">IPA</a>"
+      {:ok,
+        "<a href=\"https://untappd.com/user/nicksergeant\">nicksergeant</a> " <>
+        "is drinking " <>
+        "<a href=\"https://untappd.com/b/two-lake-ipa/123\">IPA</a>"}
+
+  A checkin without a rating:
+
+  A checkin with an image:
+
+  An existing checkin with a new image:
 
   """
   def parse_checkin(checkin) do
-    user_name = parse_name(checkin["user"])
+    {:ok, user_name} = parse_name(checkin["user"])
     user_username = checkin["user"]["user_name"]
     user = "<a href=\"https://untappd.com/user/#{user_username}\">" <>
       "#{user_name}</a>"
@@ -61,15 +68,11 @@ defmodule Slacktappdex do
     #   #{username} is drinking #{beer_name} (#{beer_type}, #{abv} ABV)
     #   by #{brewery}. They rated it a #{rating} and said \"#{comment}\".
     # """
-    "#{user} is drinking #{beer}"
+    {:ok, "#{user} is drinking #{beer}"}
   end
 
   def parse_comment(comment) do
     "comment"
-  end
-
-  defp drop_if_shushed(checkin) do
-
   end
 
   @doc """
@@ -81,60 +84,104 @@ defmodule Slacktappdex do
       iex> Slacktappdex.parse_name(%{
       ...>   "user_name" => "nicksergeant"
       ...> })
-      "nicksergeant"
+      {:ok, "nicksergeant"}
 
       iex> Slacktappdex.parse_name(%{
       ...>   "user_name" => "nicksergeant",
       ...>   "first_name" => "Nick",
       ...>   "last_name" => "Sergeant"
       ...> })
-      "Nick Sergeant"
+      {:ok, "Nick Sergeant"}
 
       iex> Slacktappdex.parse_name(%{
       ...>   "user_name" => "nicksergeant",
       ...>   "first_name" => "Nick"
       ...> })
-      "nicksergeant"
+      {:ok, "nicksergeant"}
 
   """
-  defp parse_name(user) do
+  def parse_name(user) do
     case user do
       %{
         "first_name" => first_name,
         "last_name" => last_name
       } ->
-        "#{first_name} #{last_name}"
-      _ -> "#{user["user_name"]}"
+        {:ok, "#{first_name} #{last_name}"}
+      _ ->
+        {:ok, "#{user["user_name"]}"}
     end
   end
 
-  defp process_badge(badge) do
+  @doc """
+  Determines if a checkin is eligible to be posted to Slack. Checkin is
+  ineligible if the checkin_comment contains the text "#shh".
+
+  ## Examples
+
+      iex> Slacktappdex.is_eligible_checkin(%{})
+      {:ok, %{}}
+
+      iex> Slacktappdex.is_eligible_checkin(%{"checkin_comment" => "#shh"})
+      {:error, %{"checkin_comment" => "#shh"}}
+
+  """
+  def is_eligible_checkin(checkin) do
+    cond do
+      is_nil(checkin["checkin_comment"]) ->
+        {:ok, checkin}
+      String.match?(checkin["checkin_comment"], ~r/#shh/) ->
+        {:error, checkin}
+      true ->
+        {:ok, checkin}
+    end
+  end
+
+  def process_badge(badge) do
     parse_badge(badge) |> @slack.post
-    badge
+    {:ok, badge}
   end
 
-  defp process_checkin(checkin) do
-    checkin
-      |> drop_if_shushed
-      |> parse_checkin
-      |> @slack.post
-    checkin
+  @doc ~S"""
+  Parses a checkin and posts it to Slack, if the checkin is eligible.
+
+  Ineligible checkins contain the text "#shh" in the checkin comment. For, you
+  know, day drinking.
+
+  ## Examples:
+
+  A normal checkin gets through:
+
+      iex> Slacktappdex.process_checkin(%{})
+      {:ok,
+        "<a href=\"https://untappd.com/user/\"></a> is drinking " <>
+        "<a href=\"https://untappd.com/b//\"></a>"}
+
+  Checkins with the text "#shh" in the checkin comment are ignored:
+
+      iex> Slacktappdex.process_checkin(%{"checkin_comment" => "#shh"})
+      {:error, %{"checkin_comment" => "#shh"}}
+
+  """
+  def process_checkin(checkin) do
+    with {:ok, checkin} <- is_eligible_checkin(checkin),
+         {:ok, checkin} <- parse_checkin(checkin),
+         do: @slack.post(checkin)
   end
 
-  defp process_comment(comment) do
+  def process_comment(comment) do
     parse_comment(comment) |> @slack.post
-    comment
+    {:ok, comment}
   end
 
-  defp process_badges(checkin) do
+  def process_badges({:ok, checkin}) do
     get_in(checkin, ["badges", "items"])
       |> Enum.each(&(process_badge(&1)))
-    checkin
+    {:ok, checkin}
   end
 
-  defp process_comments(checkin) do
+  def process_comments({:ok, checkin}) do
     get_in(checkin, ["comments", "items"])
       |> Enum.each(&(process_comment(&1)))
-    checkin
+    {:ok, checkin}
   end
 end

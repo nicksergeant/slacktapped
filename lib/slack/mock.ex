@@ -3,5 +3,6 @@ defmodule Slacktappdex.Slack.Mock do
 
   def post(message) do
     Logger.info("[Slack] #{message}")
+    {:ok, message}
   end
 end
