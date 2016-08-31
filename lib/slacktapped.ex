@@ -1,6 +1,6 @@
-defmodule Slacktappdex do
-  @slack Application.get_env(:slacktappdex, :slack)
-  @untappd Application.get_env(:slacktappdex, :untappd)
+defmodule Slacktapped do
+  @slack Application.get_env(:slacktapped, :slack)
+  @untappd Application.get_env(:slacktapped, :untappd)
 
   def main do
     checkins
@@ -30,7 +30,7 @@ defmodule Slacktappdex do
 
   A normal checkin:
 
-      iex> Slacktappdex.parse_checkin(%{
+      iex> Slacktapped.parse_checkin(%{
       ...>   "user" => %{
       ...>     "user_name" => "nicksergeant"
       ...>   },
@@ -81,19 +81,19 @@ defmodule Slacktappdex do
 
   ## Examples
 
-      iex> Slacktappdex.parse_name(%{
+      iex> Slacktapped.parse_name(%{
       ...>   "user_name" => "nicksergeant"
       ...> })
       {:ok, "nicksergeant"}
 
-      iex> Slacktappdex.parse_name(%{
+      iex> Slacktapped.parse_name(%{
       ...>   "user_name" => "nicksergeant",
       ...>   "first_name" => "Nick",
       ...>   "last_name" => "Sergeant"
       ...> })
       {:ok, "Nick Sergeant"}
 
-      iex> Slacktappdex.parse_name(%{
+      iex> Slacktapped.parse_name(%{
       ...>   "user_name" => "nicksergeant",
       ...>   "first_name" => "Nick"
       ...> })
@@ -118,10 +118,10 @@ defmodule Slacktappdex do
 
   ## Examples
 
-      iex> Slacktappdex.is_eligible_checkin(%{})
+      iex> Slacktapped.is_eligible_checkin(%{})
       {:ok, %{}}
 
-      iex> Slacktappdex.is_eligible_checkin(%{"checkin_comment" => "#shh"})
+      iex> Slacktapped.is_eligible_checkin(%{"checkin_comment" => "#shh"})
       {:error, %{"checkin_comment" => "#shh"}}
 
   """
@@ -151,14 +151,14 @@ defmodule Slacktappdex do
 
   A normal checkin gets through:
 
-      iex> Slacktappdex.process_checkin(%{})
+      iex> Slacktapped.process_checkin(%{})
       {:ok,
         "<a href=\"https://untappd.com/user/\"></a> is drinking " <>
         "<a href=\"https://untappd.com/b//\"></a>"}
 
   Checkins with the text "#shh" in the checkin comment are ignored:
 
-      iex> Slacktappdex.process_checkin(%{"checkin_comment" => "#shh"})
+      iex> Slacktapped.process_checkin(%{"checkin_comment" => "#shh"})
       {:error, %{"checkin_comment" => "#shh"}}
 
   """

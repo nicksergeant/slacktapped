@@ -1,5 +1,5 @@
 use Mix.Config
 
 config :mix_test_watch, clear: true
-config :slacktappdex, :slack, Slacktappdex.Slack.Mock
-config :slacktappdex, :untappd, Slacktappdex.Untappd.Mock
+config :slacktapped, :slack, Slacktapped.Slack.Mock
+config :slacktapped, :untappd, Slacktapped.Untappd.Mock

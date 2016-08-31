@@ -1,10 +1,10 @@
-defmodule Slacktappdex.Slack.Live do
+defmodule Slacktapped.Slack.Live do
   def post(message) do
     webhook_url = System.get_env("SLACK_WEBHOOK_URL")
 
     HTTPotion.post(webhook_url, [
       body: Poison.encode!(%{
-        icon_url: "https://slacktappd.s3.amazonaws.com/icon.jpg",
+        icon_url: "https://slacktapped.s3.amazonaws.com/icon.jpg",
         text: message,
         username: "Untappd"
       }),

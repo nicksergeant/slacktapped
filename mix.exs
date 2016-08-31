@@ -1,8 +1,8 @@
-defmodule Slacktappdex.Mixfile do
+defmodule Slacktapped.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :slacktappdex,
+    [app: :slacktapped,
      version: "0.1.0",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,

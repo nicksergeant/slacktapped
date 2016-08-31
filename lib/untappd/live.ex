@@ -1,4 +1,4 @@
-defmodule Slacktappdex.Untappd.Live do
+defmodule Slacktapped.Untappd.Live do
   def get(path) do
     HTTPotion.get(api_url(path))
   end

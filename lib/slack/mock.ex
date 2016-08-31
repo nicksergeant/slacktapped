@@ -1,4 +1,4 @@
-defmodule Slacktappdex.Slack.Mock do
+defmodule Slacktapped.Slack.Mock do
   require Logger
 
   def post(message) do
