@@ -151,6 +151,25 @@ defmodule Slacktapped do
 
   An existing checkin with a new image:
 
+  ### TODO:
+
+  {
+    "attachments": [
+        {
+            "fallback": "Image of this checkin.",
+            "color": "#FFCF0B",
+            "pretext": "<http://google.com/to/user|Nick Sergeant> is drinking Kirby's Kolsch.\nThey rated it a 3.5 and said \"Lovely!\" <http://google.com/to/toast|Toast »>",
+            "author_name": "Muskoka Brewery",
+            "author_link": "http://google.com/path/to/brewery",
+            "author_icon": "https://untappd.akamaized.net/site/brewery_logos/brewery-muskoka.jpg",
+            "title": "Kirby's Kolsch",
+            "title_link": "http://google.com/path/to/beer",
+            "text": "Kolsch, 4.6% ABV",
+            "image_url": "https://untappd.akamaized.net/photo/2016_08_28/7d8e03ffe8f258f9db445e17894c2c12_640x640.jpg"
+        }
+    ]
+  }
+
   """
   def parse_checkin(checkin) do
     {:ok, user_name} = parse_name(checkin["user"])

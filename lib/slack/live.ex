@@ -4,7 +4,12 @@ defmodule Slacktapped.Slack.Live do
 
     HTTPotion.post(webhook_url, [
       body: Poison.encode!(%{
-        attachments: [%{image_url: image_url}],
+        attachments: [
+          %{
+            fallback: "Image of this checkin.",
+            image_url: image_url
+          }
+        ],
         icon_url: "https://slacktapped.s3.amazonaws.com/icon.jpg",
         text: message,
         username: "Untappd",
