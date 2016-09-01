@@ -86,6 +86,7 @@ defmodule Slacktapped do
       ...>     "brewery_name" => "Two Lake"
       ...>   },
       ...>   "checkin_comment" => "Lovely!",
+      ...>   "checkin_id" => 567,
       ...>   "rating_score" => 3.5
       ...> })
       {:ok,
@@ -93,7 +94,8 @@ defmodule Slacktapped do
         "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
         "(American IPA, 4.5% ABV) " <>
         "by <https://untappd.com/brewery/1|Two Lake>.\n" <>
-        "They rated it a 3.5 and said \"Lovely!\"",
+        "They rated it a 3.5 and said \"Lovely!\" " <>
+        "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
        ""}
 
   A checkin without a rating:
@@ -102,7 +104,8 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\"",
+        "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\" " <>
+        "<https://untappd.com/user//checkin/|Toast »>",
        ""}
 
   A checkin without a comment:
@@ -111,7 +114,8 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.\nThey rated it a 1.5.",
+        "<https://untappd.com/brewery/|>.\nThey rated it a 1.5. " <>
+        "<https://untappd.com/user//checkin/|Toast »>",
        ""}
 
   A checkin without a comment or rating:
@@ -120,7 +124,8 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.",
+        "<https://untappd.com/brewery/|>. " <>
+        "<https://untappd.com/user//checkin/|Toast »>",
        ""}
 
   A checkin with an image:
@@ -140,7 +145,8 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.",
+        "<https://untappd.com/brewery/|>. " <>
+        "<https://untappd.com/user//checkin/|Toast »>",
        "https://path/to/image"}
 
   An existing checkin with a new image:
@@ -157,11 +163,13 @@ defmodule Slacktapped do
     brewery_id = checkin["brewery"]["brewery_id"]
     brewery_name = checkin["brewery"]["brewery_name"]
     checkin_comment = checkin["checkin_comment"]
+    checkin_id = checkin["checkin_id"]
     checkin_rating = checkin["rating_score"]
     user_username = checkin["user"]["user_name"]
 
     beer = "<https://untappd.com/b/#{beer_slug}/#{beer_id}|#{beer_name}>"
     brewery = "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>"
+    toast = "<https://untappd.com/user/#{user_username}/checkin/#{checkin_id}|Toast »>"
     user = "<https://untappd.com/user/#{user_username}|#{user_name}>"
 
     rating_and_comment = cond do
@@ -181,7 +189,7 @@ defmodule Slacktapped do
 
     image_url = cond do
       is_list(media_items) and Enum.count(media_items) >= 1 ->
-        it = media_items
+        media_items
           |> Enum.at(0)
           |> get_in(["photo", "photo_img_lg"])
       true -> ""
@@ -189,7 +197,7 @@ defmodule Slacktapped do
 
     {:ok,
       "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV) " <>
-      "by #{brewery}.#{rating_and_comment}",
+      "by #{brewery}.#{rating_and_comment} #{toast}",
      image_url}
   end
 
@@ -278,7 +286,7 @@ defmodule Slacktapped do
   def process_checkin(checkin) do
     with {:ok, checkin} <- is_eligible_checkin(checkin),
          {:ok, message, image_url} <- parse_checkin(checkin),
-         {:ok, _message} <- @slack.post(message),
+         {:ok, _message} <- @slack.post(message, image_url),
          do: {:ok, checkin}
   end
 
