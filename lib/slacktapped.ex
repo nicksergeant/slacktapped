@@ -68,7 +68,7 @@ defmodule Slacktapped do
 
   ## Examples
 
-  A normal checkin:
+  A typical checkin with a rating and comment:
 
       iex> Slacktapped.parse_checkin(%{
       ...>   "user" => %{
@@ -84,17 +84,43 @@ defmodule Slacktapped do
       ...>   "brewery" => %{
       ...>     "brewery_id" => 1,
       ...>     "brewery_name" => "Two Lake"
-      ...>   }
+      ...>   },
+      ...>   "checkin_comment" => "Lovely!",
+      ...>   "rating_score" => 3.5
       ...> })
       {:ok,
-        "<https://untappd.com/user/nicksergeant|nicksergeant> " <>
-        "is drinking " <>
+        "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
         "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
         "(American IPA, 4.5% ABV) " <>
-        "by <https://untappd.com/brewery/1|Two Lake>."
-      }
+        "by <https://untappd.com/brewery/1|Two Lake>.\n" <>
+        "They rated it a 3.5 and said \"Lovely!\"."}
 
   A checkin without a rating:
+
+      iex> Slacktapped.parse_checkin(%{"checkin_comment" => "Lovely!"})
+      {:ok,
+        "<https://untappd.com/user/|> is drinking " <>
+        "<https://untappd.com/b//|> (, % ABV) by " <>
+        "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\"."
+      }
+
+  A checkin without a comment:
+
+      iex> Slacktapped.parse_checkin(%{"rating_score" => 1.5})
+      {:ok,
+        "<https://untappd.com/user/|> is drinking " <>
+        "<https://untappd.com/b//|> (, % ABV) by " <>
+        "<https://untappd.com/brewery/|>.\nThey rated it a 1.5."
+      }
+
+  A checkin without a comment or rating:
+
+      iex> Slacktapped.parse_checkin(%{})
+      {:ok,
+        "<https://untappd.com/user/|> is drinking " <>
+        "<https://untappd.com/b//|> (, % ABV) by " <>
+        "<https://untappd.com/brewery/|>."
+      }
 
   A checkin with an image:
 
@@ -111,17 +137,27 @@ defmodule Slacktapped do
     beer_style = checkin["beer"]["beer_style"]
     brewery_id = checkin["brewery"]["brewery_id"]
     brewery_name = checkin["brewery"]["brewery_name"]
+    checkin_comment = checkin["checkin_comment"]
+    checkin_rating = checkin["rating_score"]
     user_username = checkin["user"]["user_name"]
 
     beer = "<https://untappd.com/b/#{beer_slug}/#{beer_id}|#{beer_name}>"
     brewery = "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>"
     user = "<https://untappd.com/user/#{user_username}|#{user_name}>"
 
-    # TODO: user rating and checkin_comment.
+    rating_and_comment = cond do
+      is_binary(checkin_comment) and is_number(checkin_rating) -> 
+        "\nThey rated it a #{checkin_rating} and said \"#{checkin_comment}\"."
+      is_binary(checkin_comment) ->
+        "\nThey said \"#{checkin_comment}\"."
+      is_number(checkin_rating) ->
+        "\nThey rated it a #{checkin_rating}."
+      true -> ""
+    end
 
     {:ok,
       "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV) " <>
-      "by #{brewery}."}
+      "by #{brewery}.#{rating_and_comment}"}
   end
 
   def parse_comment(comment) do
@@ -134,9 +170,7 @@ defmodule Slacktapped do
 
   ## Examples
 
-      iex> Slacktapped.parse_name(%{
-      ...>   "user_name" => "nicksergeant"
-      ...> })
+      iex> Slacktapped.parse_name(%{"user_name" => "nicksergeant"})
       {:ok, "nicksergeant"}
 
       iex> Slacktapped.parse_name(%{
@@ -165,12 +199,24 @@ defmodule Slacktapped do
     end
   end
 
+  @doc """
+  Parses a badge and posts it to Slack.
+
+  ## Example
+  
+      iex> Slacktapped.process_badge(%{})
+      {:ok, %{}}
+
+  """
   def process_badge(badge) do
     parse_badge(badge)
       |> @slack.post
     {:ok, badge}
   end
 
+  @doc """
+  Gets all of the badges from a checkin and processes them.
+  """
   def process_badges(checkin) do
     get_in(checkin, ["badges", "items"])
       |> Enum.each(&(process_badge(&1)))
@@ -203,12 +249,24 @@ defmodule Slacktapped do
          do: {:ok, checkin}
   end
 
+  @doc """
+  Parses a comment and posts it to Slack.
+
+  ## Example
+  
+      iex> Slacktapped.process_comment(%{})
+      {:ok, %{}}
+
+  """
   def process_comment(comment) do
     parse_comment(comment)
       |> @slack.post
     {:ok, comment}
   end
 
+  @doc """
+  Gets all of the comments from a checkin and processes them.
+  """
   def process_comments(checkin) do
     get_in(checkin, ["comments", "items"])
       |> Enum.each(&(process_comment(&1)))
