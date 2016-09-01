@@ -146,10 +146,13 @@ defmodule Slacktapped do
     user = "<https://untappd.com/user/#{user_username}|#{user_name}>"
 
     rating_and_comment = cond do
-      is_binary(checkin_comment) and is_number(checkin_rating) -> 
-        "\nThey rated it a #{checkin_rating} and said \"#{checkin_comment}\"."
-      is_binary(checkin_comment) ->
-        "\nThey said \"#{checkin_comment}\"."
+      is_binary(checkin_comment)
+        and checkin_comment != ""
+        and is_number(checkin_rating) -> 
+          "\nThey rated it a #{checkin_rating} and said \"#{checkin_comment}\""
+      is_binary(checkin_comment)
+        and checkin_comment != "" ->
+          "\nThey said \"#{checkin_comment}\""
       is_number(checkin_rating) ->
         "\nThey rated it a #{checkin_rating}."
       true -> ""

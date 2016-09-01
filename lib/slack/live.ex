@@ -5,6 +5,7 @@ defmodule Slacktapped.Slack.Live do
     HTTPotion.post(webhook_url, [
       body: Poison.encode!(%{
         icon_url: "https://slacktapped.s3.amazonaws.com/icon.jpg",
+        image_url: "",
         text: message,
         username: "Untappd"
       }),
