@@ -14,7 +14,7 @@ defmodule Slacktapped do
   """
   def main do
     checkins
-      # |> Enum.take(1) # TODO: Remove for prod.
+      |> Enum.take(1) # TODO: Remove for prod.
       |> Enum.each(fn(checkin) ->
         with {:ok, checkin} <- process_checkin(checkin),
              {:ok, checkin} <- process_badges(checkin),
@@ -93,7 +93,8 @@ defmodule Slacktapped do
         "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
         "(American IPA, 4.5% ABV) " <>
         "by <https://untappd.com/brewery/1|Two Lake>.\n" <>
-        "They rated it a 3.5 and said \"Lovely!\"."}
+        "They rated it a 3.5 and said \"Lovely!\"",
+       ""}
 
   A checkin without a rating:
 
@@ -101,8 +102,8 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\"."
-      }
+        "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\"",
+       ""}
 
   A checkin without a comment:
 
@@ -110,8 +111,8 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.\nThey rated it a 1.5."
-      }
+        "<https://untappd.com/brewery/|>.\nThey rated it a 1.5.",
+       ""}
 
   A checkin without a comment or rating:
 
@@ -119,10 +120,28 @@ defmodule Slacktapped do
       {:ok,
         "<https://untappd.com/user/|> is drinking " <>
         "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>."
-      }
+        "<https://untappd.com/brewery/|>.",
+       ""}
 
   A checkin with an image:
+
+      iex> Slacktapped.parse_checkin(%{
+      ...>   "media" => %{
+      ...>     "items" => [
+      ...>       %{
+      ...>         "photo" => %{
+      ...>           "photo_id" => 987,
+      ...>           "photo_img_lg" => "https://path/to/image"
+      ...>         }
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> })
+      {:ok,
+        "<https://untappd.com/user/|> is drinking " <>
+        "<https://untappd.com/b//|> (, % ABV) by " <>
+        "<https://untappd.com/brewery/|>.",
+       "https://path/to/image"}
 
   An existing checkin with a new image:
 
@@ -158,9 +177,20 @@ defmodule Slacktapped do
       true -> ""
     end
 
+    media_items = checkin["media"]["items"]
+
+    image_url = cond do
+      is_list(media_items) and Enum.count(media_items) >= 1 ->
+        it = media_items
+          |> Enum.at(0)
+          |> get_in(["photo", "photo_img_lg"])
+      true -> ""
+    end
+
     {:ok,
       "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV) " <>
-      "by #{brewery}.#{rating_and_comment}"}
+      "by #{brewery}.#{rating_and_comment}",
+     image_url}
   end
 
   def parse_comment(comment) do
@@ -247,8 +277,8 @@ defmodule Slacktapped do
   """
   def process_checkin(checkin) do
     with {:ok, checkin} <- is_eligible_checkin(checkin),
-         {:ok, message} <- parse_checkin(checkin),
-         {:ok, message} <- @slack.post(message),
+         {:ok, message, image_url} <- parse_checkin(checkin),
+         {:ok, _message} <- @slack.post(message),
          do: {:ok, checkin}
   end
 
