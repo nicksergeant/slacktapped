@@ -16,7 +16,7 @@ defmodule Slacktapped do
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
-      |> Enum.take(1) # TODO: Remove for prod.
+      |> Enum.take(3) # TODO: Remove for prod.
       |> Enum.each(&(handle_checkin(&1)))
   end
 
@@ -39,10 +39,20 @@ defmodule Slacktapped do
           "beer" => %{},
           "attachments" => [
             %{
+              "author_icon" => nil,
+              "author_link" => "https://untappd.com/brewery/",
+              "author_name" => nil,
+              "color" => "#FFCF0B",
+              "fallback" => "Image of this checkin.",
+              "footer" => "<https://untappd.com/user/|>",
+              "footer_icon" => nil,
               "image_url" => nil,
               "pretext" => "<https://untappd.com/user/|> is drinking " <>
-                 "<https://untappd.com/b//|>. " <>
-                 "<https://untappd.com/user//checkin/|Toast »>"
+                "<https://untappd.com/b//|>. " <>
+                "<https://untappd.com/user//checkin/|Toast »>",
+              "text" => ", % ABV",
+              "title" => nil,
+              "title_link" => "https://untappd.com/b//"
             }
           ]
         }

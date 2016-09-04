@@ -17,31 +17,44 @@ defmodule Slacktapped.Checkins do
       iex> Slacktapped.Checkins.parse_checkin(%{
       ...>   "attachments" => [],
       ...>   "user" => %{
-      ...>     "user_name" => "nicksergeant"
+      ...>     "user_name" => "nicksergeant",
+      ...>     "user_avatar" => "http://path/to/user/avatar"
       ...>   },
       ...>   "beer" => %{
       ...>     "bid" => 123,
       ...>     "beer_abv" => 4.5,
-      ...>     "beer_label" => "https://foo.bar/site/beer_logos/label.jpeg",
+      ...>     "beer_label" => "http://path/to/beer/label",
       ...>     "beer_name" => "IPA",
       ...>     "beer_slug" => "two-lake-ipa",
       ...>     "beer_style" => "American IPA"
       ...>   },
       ...>   "brewery" => %{
       ...>     "brewery_id" => 1,
+      ...>     "brewery_label" => "http://path/to/brewery/label",
       ...>     "brewery_name" => "Two Lake"
       ...>   },
       ...>   "checkin_comment" => "Lovely!",
       ...>   "checkin_id" => 567,
       ...>   "rating_score" => 3.5
       ...> })
-      {:ok, %{
-        "image_url" => "https://foo.bar/site/beer_logos/label.jpeg",
-        "pretext" => "" <>
-          "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
-          "<https://untappd.com/b/two-lake-ipa/123|IPA>." <>
-          "\nThey rated it a 3.5 and said \"Lovely!\" " <>
-          "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>"
+      {:ok,
+        %{
+          "author_icon" => "http://path/to/brewery/label",
+          "author_link" => "https://untappd.com/brewery/1",
+          "author_name" => "Two Lake",
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/user/nicksergeant|nicksergeant>",
+          "footer_icon" => "http://path/to/user/avatar",
+          "image_url" => "http://path/to/beer/label",
+          "pretext" => "" <>
+            "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
+            "<https://untappd.com/b/two-lake-ipa/123|IPA>." <>
+            "\nThey rated it a 3.5 and said \"Lovely!\" " <>
+            "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
+          "text" => "American IPA, 4.5% ABV",
+          "title" => "IPA",
+          "title_link" => "https://untappd.com/b/two-lake-ipa/123"
         }
       }
 
@@ -51,38 +64,71 @@ defmodule Slacktapped.Checkins do
       ...>   "attachments" => [],
       ...>   "checkin_comment" => "Lovely!"
       ...> })
-      {:ok, %{
-        "image_url" => nil,
-        "pretext" => "" <>
-          "<https://untappd.com/user/|> is drinking " <>
-          "<https://untappd.com/b//|>." <>
-          "\nThey said \"Lovely!\" " <>
-          "<https://untappd.com/user//checkin/|Toast »>"
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/brewery/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/user/|>",
+          "footer_icon" => nil,
+          "image_url" => nil,
+          "pretext" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|>." <>
+            "\nThey said \"Lovely!\" " <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "text" => ", % ABV",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
         }
       }
 
   A checkin without a comment:
 
       iex> Slacktapped.Checkins.parse_checkin(%{"rating_score" => 1.5})
-      {:ok, %{
-        "image_url" => nil,
-        "pretext" => "" <>
-          "<https://untappd.com/user/|> is drinking " <>
-          "<https://untappd.com/b//|>." <>
-          "\nThey rated it a 1.5. " <>
-          "<https://untappd.com/user//checkin/|Toast »>"
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/brewery/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/user/|>",
+          "footer_icon" => nil,
+          "image_url" => nil,
+          "pretext" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|>." <>
+            "\nThey rated it a 1.5. " <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "text" => ", % ABV",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
         }
       }
 
   A checkin without a comment or rating:
 
       iex> Slacktapped.Checkins.parse_checkin(%{})
-      {:ok, %{
-        "image_url" => nil,
-        "pretext" => "" <>
-          "<https://untappd.com/user/|> is drinking " <>
-          "<https://untappd.com/b//|>. " <>
-          "<https://untappd.com/user//checkin/|Toast »>"
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/brewery/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/user/|>",
+          "footer_icon" => nil,
+          "image_url" => nil,
+          "pretext" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|>. " <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "text" => ", % ABV",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
         }
       }
 
@@ -94,42 +140,62 @@ defmodule Slacktapped.Checkins do
       ...>       %{
       ...>         "photo" => %{
       ...>           "photo_id" => 987,
-      ...>           "photo_img_lg" => "https://path/to/image"
+      ...>           "photo_img_lg" => "http://path/to/beer/image"
       ...>         }
       ...>       }
       ...>     ]
       ...>   }
       ...> })
-      {:ok, %{
-        "image_url" => "https://path/to/image",
-        "pretext" => "" <>
-          "<https://untappd.com/user/|> is drinking " <>
-          "<https://untappd.com/b//|>. " <>
-          "<https://untappd.com/user//checkin/|Toast »>"
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/brewery/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/user/|>",
+          "footer_icon" => nil,
+          "image_url" => "http://path/to/beer/image",
+          "pretext" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|>. " <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "text" => ", % ABV",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
         }
       }
 
   A checkin with a venue:
 
-  ## Sample:
-
-  {
-    "attachments": [
-      {
-          "fallback": "Image of this checkin.",
-          "color": "#FFCF0B",
-          "pretext": "<http://google.com/to/user|Nick Sergeant> is drinking <http://google.com/path/to/beer|Kirby's Kolsch> at <http://google.com/to/venue|Sampson State Park>.\nThey rated it a 3.5 and said \"Lovely!\" <http://google.com/to/toast|Toast »>",
-          "author_name": "Muskoka Brewery",
-          "author_link": "http://google.com/path/to/brewery",
-          "author_icon": "https://untappd.akamaized.net/site/brewery_logos/brewery-muskoka.jpg",
-          "title": "Kirby's Kolsch",
-          "title_link": "http://google.com/path/to/beer",
-          "text": "Kolsch, 4.6% ABV",
-          "footer": "<http://google.com/to/user|nicksergeant>",
-          "footer_icon": "https://gravatar.com/avatar/a74159ce0c29f89b75a25037e40b27a4?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2.jpg%3Fv%3D1"
+      iex> Slacktapped.Checkins.parse_checkin(%{
+      ...>   "attachments" => [],
+      ...>   "venue" => %{
+      ...>     "venue_id" => 789,
+      ...>     "venue_name" => "Venue Name",
+      ...>     "venue_slug" => "venue-slug"
+      ...>   }
+      ...> })
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/brewery/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/user/|>",
+          "footer_icon" => nil,
+          "image_url" => nil,
+          "pretext" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|> " <>
+            "at <https://untappd.com/v/venue-slug/789|Venue Name>. " <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "text" => ", % ABV",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
+        }
       }
-    ]
-  }
 
   """
   def parse_checkin(checkin) do
@@ -143,14 +209,15 @@ defmodule Slacktapped.Checkins do
     beer_style = checkin["beer"]["beer_style"]
     brewery_id = checkin["brewery"]["brewery_id"]
     brewery_name = checkin["brewery"]["brewery_name"]
+    brewery_label = checkin["brewery"]["brewery_label"]
     checkin_comment = checkin["checkin_comment"]
     checkin_id = checkin["checkin_id"]
     checkin_rating = checkin["rating_score"]
     media_items = checkin["media"]["items"]
+    user_avatar = checkin["user"]["user_avatar"]
     user_username = checkin["user"]["user_name"]
 
     beer = "<https://untappd.com/b/#{beer_slug}/#{beer_id}|#{beer_name}>"
-    brewery = "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>"
     toast = "<https://untappd.com/user/#{user_username}/checkin/#{checkin_id}|Toast »>"
     user = "<https://untappd.com/user/#{user_username}|#{user_name}>"
 
@@ -167,6 +234,15 @@ defmodule Slacktapped.Checkins do
       true -> ""
     end
 
+    venue = cond do
+      is_map(checkin["venue"]) ->
+        venue_id = checkin["venue"]["venue_id"]
+        venue_name = checkin["venue"]["venue_name"]
+        venue_slug = checkin["venue"]["venue_slug"]
+        " at <https://untappd.com/v/#{venue_slug}/#{venue_id}|#{venue_name}>"
+      true -> ""
+    end
+
     image_url = cond do
       is_list(media_items) and Enum.count(media_items) >= 1 ->
         media_items
@@ -175,11 +251,21 @@ defmodule Slacktapped.Checkins do
       true -> beer_label
     end
 
-    pretext = "#{user} is drinking #{beer}.#{rating_and_comment} #{toast}"
+    pretext = "#{user} is drinking #{beer}#{venue}.#{rating_and_comment} #{toast}"
 
     {:ok, %{
+      "author_icon" => brewery_label,
+      "author_link" => "https://untappd.com/brewery/#{brewery_id}",
+      "author_name" => brewery_name,
+      "color" => "#FFCF0B",
+      "fallback" => "Image of this checkin.",
+      "footer" => "<https://untappd.com/user/#{user_username}|#{user_username}>",
+      "footer_icon" => user_avatar,
       "image_url" => image_url,
-      "pretext" => pretext
+      "pretext" => pretext,
+      "text" => "#{beer_style}, #{beer_abv}% ABV",
+      "title" => beer_name,
+      "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
     }}
   end
 end
