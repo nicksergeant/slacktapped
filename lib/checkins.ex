@@ -47,12 +47,12 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/user/nicksergeant|nicksergeant>",
           "footer_icon" => "http://path/to/user/avatar",
           "image_url" => "http://path/to/beer/label",
-          "pretext" => "" <>
+          "text" => "" <>
             "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
-            "<https://untappd.com/b/two-lake-ipa/123|IPA>." <>
+            "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
+            "(American IPA, 4.5% ABV)." <>
             "\nThey rated it a 3.5 and said \"Lovely!\" " <>
             "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
-          "text" => "American IPA, 4.5% ABV",
           "title" => "IPA",
           "title_link" => "https://untappd.com/b/two-lake-ipa/123"
         }
@@ -74,12 +74,11 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/user/|>",
           "footer_icon" => nil,
           "image_url" => nil,
-          "pretext" => "" <>
+          "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|>." <>
+            "<https://untappd.com/b//|> (, % ABV)." <>
             "\nThey said \"Lovely!\" " <>
             "<https://untappd.com/user//checkin/|Toast »>",
-          "text" => ", % ABV",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
         }
@@ -98,12 +97,11 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/user/|>",
           "footer_icon" => nil,
           "image_url" => nil,
-          "pretext" => "" <>
+          "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|>." <>
+            "<https://untappd.com/b//|> (, % ABV)." <>
             "\nThey rated it a 1.5. " <>
             "<https://untappd.com/user//checkin/|Toast »>",
-          "text" => ", % ABV",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
         }
@@ -122,11 +120,10 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/user/|>",
           "footer_icon" => nil,
           "image_url" => nil,
-          "pretext" => "" <>
+          "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|>. " <>
+            "<https://untappd.com/b//|> (, % ABV). " <>
             "<https://untappd.com/user//checkin/|Toast »>",
-          "text" => ", % ABV",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
         }
@@ -156,11 +153,10 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/user/|>",
           "footer_icon" => nil,
           "image_url" => "http://path/to/beer/image",
-          "pretext" => "" <>
+          "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|>. " <>
+            "<https://untappd.com/b//|> (, % ABV). " <>
             "<https://untappd.com/user//checkin/|Toast »>",
-          "text" => ", % ABV",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
         }
@@ -186,12 +182,11 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/user/|>",
           "footer_icon" => nil,
           "image_url" => nil,
-          "pretext" => "" <>
+          "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> " <>
+            "<https://untappd.com/b//|> (, % ABV) " <>
             "at <https://untappd.com/v/venue-slug/789|Venue Name>. " <>
             "<https://untappd.com/user//checkin/|Toast »>",
-          "text" => ", % ABV",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
         }
@@ -251,8 +246,6 @@ defmodule Slacktapped.Checkins do
       true -> beer_label
     end
 
-    pretext = "#{user} is drinking #{beer}#{venue}.#{rating_and_comment} #{toast}"
-
     {:ok, %{
       "author_icon" => brewery_label,
       "author_link" => "https://untappd.com/brewery/#{brewery_id}",
@@ -262,8 +255,7 @@ defmodule Slacktapped.Checkins do
       "footer" => "<https://untappd.com/user/#{user_username}|#{user_username}>",
       "footer_icon" => user_avatar,
       "image_url" => image_url,
-      "pretext" => pretext,
-      "text" => "#{beer_style}, #{beer_abv}% ABV",
+      "text" => "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV)#{venue}.#{rating_and_comment} #{toast}",
       "title" => beer_name,
       "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
     }}
