@@ -17,8 +17,8 @@ defmodule Slacktapped do
       |> Enum.take(1) # TODO: Remove for prod.
       |> Enum.each(fn(checkin) ->
         with {:ok, checkin} <- process_checkin(checkin),
-             {:ok, checkin} <- process_badges(checkin),
-             {:ok, checkin} <- process_comments(checkin),
+             # {:ok, checkin} <- process_badges(checkin),
+             # {:ok, checkin} <- process_comments(checkin),
              do: :ok
       end)
   end
@@ -77,6 +77,7 @@ defmodule Slacktapped do
       ...>   "beer" => %{
       ...>     "bid" => 123,
       ...>     "beer_abv" => 4.5,
+      ...>     "beer_label" => "https://foo.bar/site/beer_logos/label.jpeg",
       ...>     "beer_name" => "IPA",
       ...>     "beer_slug" => "two-lake-ipa",
       ...>     "beer_style" => "American IPA"
@@ -96,7 +97,7 @@ defmodule Slacktapped do
         "by <https://untappd.com/brewery/1|Two Lake>.\n" <>
         "They rated it a 3.5 and said \"Lovely!\" " <>
         "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
-       ""}
+       "https://foo.bar/site/beer_logos/label.jpeg"}
 
   A checkin without a rating:
 
@@ -106,7 +107,7 @@ defmodule Slacktapped do
         "<https://untappd.com/b//|> (, % ABV) by " <>
         "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\" " <>
         "<https://untappd.com/user//checkin/|Toast »>",
-       ""}
+       nil}
 
   A checkin without a comment:
 
@@ -116,7 +117,7 @@ defmodule Slacktapped do
         "<https://untappd.com/b//|> (, % ABV) by " <>
         "<https://untappd.com/brewery/|>.\nThey rated it a 1.5. " <>
         "<https://untappd.com/user//checkin/|Toast »>",
-       ""}
+       nil}
 
   A checkin without a comment or rating:
 
@@ -126,7 +127,7 @@ defmodule Slacktapped do
         "<https://untappd.com/b//|> (, % ABV) by " <>
         "<https://untappd.com/brewery/|>. " <>
         "<https://untappd.com/user//checkin/|Toast »>",
-       ""}
+       nil}
 
   A checkin with an image:
 
@@ -149,23 +150,28 @@ defmodule Slacktapped do
         "<https://untappd.com/user//checkin/|Toast »>",
        "https://path/to/image"}
 
-  An existing checkin with a new image:
+  A checkin with a venue:
 
   ### TODO:
 
+  Show location / venue it was checked into.
+  Add to attachments array on checkin then pipe to slack.post in main()
+  If no user uploaded image, show label instead.
   {
     "attachments": [
         {
             "fallback": "Image of this checkin.",
             "color": "#FFCF0B",
-            "pretext": "<http://google.com/to/user|Nick Sergeant> is drinking Kirby's Kolsch.\nThey rated it a 3.5 and said \"Lovely!\" <http://google.com/to/toast|Toast »>",
+            "pretext": "<http://google.com/to/user|Nick Sergeant> is drinking <http://google.com/path/to/beer|Kirby's Kolsch> at <http://google.com/to/venue|Sampson State Park>.\nThey rated it a 3.5 and said \"Lovely!\" <http://google.com/to/toast|Toast »>",
             "author_name": "Muskoka Brewery",
             "author_link": "http://google.com/path/to/brewery",
             "author_icon": "https://untappd.akamaized.net/site/brewery_logos/brewery-muskoka.jpg",
             "title": "Kirby's Kolsch",
             "title_link": "http://google.com/path/to/beer",
             "text": "Kolsch, 4.6% ABV",
-            "image_url": "https://untappd.akamaized.net/photo/2016_08_28/7d8e03ffe8f258f9db445e17894c2c12_640x640.jpg"
+            "image_url": "https://untappd.akamaized.net/photo/2016_08_28/7d8e03ffe8f258f9db445e17894c2c12_640x640.jpg",
+            "footer": "<http://google.com/to/user|nicksergeant>",
+            "footer_icon": "https://gravatar.com/avatar/a74159ce0c29f89b75a25037e40b27a4?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2.jpg%3Fv%3D1"
         }
     ]
   }
@@ -176,6 +182,7 @@ defmodule Slacktapped do
 
     beer_abv = checkin["beer"]["beer_abv"]
     beer_id = checkin["beer"]["bid"]
+    beer_label = checkin["beer"]["beer_label"]
     beer_name = checkin["beer"]["beer_name"]
     beer_slug = checkin["beer"]["beer_slug"]
     beer_style = checkin["beer"]["beer_style"]
@@ -211,7 +218,7 @@ defmodule Slacktapped do
         media_items
           |> Enum.at(0)
           |> get_in(["photo", "photo_img_lg"])
-      true -> ""
+      true -> beer_label
     end
 
     {:ok,
@@ -270,7 +277,6 @@ defmodule Slacktapped do
   """
   def process_badge(badge) do
     parse_badge(badge)
-      |> @slack.post
     {:ok, badge}
   end
 
@@ -320,7 +326,6 @@ defmodule Slacktapped do
   """
   def process_comment(comment) do
     parse_comment(comment)
-      |> @slack.post
     {:ok, comment}
   end
 
