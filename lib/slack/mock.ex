@@ -1,8 +1,8 @@
 defmodule Slacktapped.Slack.Mock do
   require Logger
 
-  def post(message, image_url \\ "") do
-    # Logger.info("[Slack] #{message}")
-    {:ok, message}
+  def post(checkin \\ "") do
+    # IO.inspect(checkin["attachments"])
+    {:ok, checkin}
   end
 end

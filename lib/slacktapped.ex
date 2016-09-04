@@ -3,8 +3,7 @@ defmodule Slacktapped do
   @untappd Application.get_env(:slacktapped, :untappd)
 
   @doc """
-  Fetches checkins from Untappd and then processes each checkin, its badges,
-  and its comments.
+  Fetches checkins from Untappd and then processes each checkin.
 
   ## Example
 
@@ -13,36 +12,77 @@ defmodule Slacktapped do
 
   """
   def main do
-    checkins
+    @untappd.get("checkin/recent")
+      |> Map.fetch!(:body)
+      |> Poison.decode!
+      |> get_in(["response", "checkins", "items"])
       |> Enum.take(1) # TODO: Remove for prod.
       |> Enum.each(fn(checkin) ->
-        with {:ok, checkin} <- process_checkin(checkin),
-             # {:ok, checkin} <- process_badges(checkin),
-             # {:ok, checkin} <- process_comments(checkin),
-             do: :ok
-      end)
+          with {:ok, checkin} <- handle_checkin(checkin),
+            do: :ok
+        end)
   end
 
-  @doc """
-  Makes an API request to Untappd to fetch the recent checkins, then gets the
-  body of the response. We then encode the response to a map and retrieve only
-  the checkin items.
+  @doc ~S"""
+  Processes a checkin and posts it to Slack, if the checkin is eligible. It
+  adds an "attachments" list to the checkin map, which is used to aggregate
+  individual attachments from the checkin, comments, and badges. The final
+  state of "attachments" is what gets sent directly to the Slack webhook.
+
+  Ineligible checkins contain the text "#shh" in the checkin comment.
+  For, you know, day drinking.
+
+  ## Examples
+
+  A normal checkin gets through:
+
+      iex> Slacktapped.handle_checkin(%{"beer" => %{}})
+      {:ok,
+        %{
+          "beer" => %{},
+          "attachments" => [
+            %{
+              "image_url" => nil,
+              "pretext" => "<https://untappd.com/user/|> is drinking " <>
+                 "<https://untappd.com/b//|>. " <>
+                 "<https://untappd.com/user//checkin/|Toast »>"
+            }
+          ]
+        }
+      }
+
+  A checkin with no beer is ignored:
+
+      iex> Slacktapped.handle_checkin(%{})
+      {:error, %{"attachments" => []}}
+
+  Checkins with the text "#shh" in the checkin comment are ignored:
+
+      iex> Slacktapped.handle_checkin(%{"checkin_comment" => "#shh"})
+      {:error, %{"attachments" => [], "checkin_comment" => "#shh"}}
+
   """
-  def checkins do
-    @untappd.get("checkin/recent")
-     |> Map.fetch!(:body)
-     |> Poison.decode!
-     |> get_in(["response", "checkins", "items"])
+  def handle_checkin(checkin) do
+    checkin = Map.put(checkin, "attachments", [])
+
+    with {:ok, checkin} <- is_eligible_checkin(checkin),
+         {:ok, checkin} <- Slacktapped.Checkins.process_checkin(checkin),
+         {:ok, checkin} <- @slack.post(checkin),
+         do: {:ok, checkin}
   end
 
   @doc """
   Determines if a checkin is eligible to be posted to Slack. Checkin is
-  ineligible if the checkin_comment contains the text "#shh".
+  ineligible if the checkin_comment contains the text "#shh", or if there is
+  no beer.
 
   ## Examples
 
       iex> Slacktapped.is_eligible_checkin(%{})
-      {:ok, %{}}
+      {:error, %{}}
+
+      iex> Slacktapped.is_eligible_checkin(%{"beer" => %{}})
+      {:ok, %{"beer" => %{}}}
 
       iex> Slacktapped.is_eligible_checkin(%{"checkin_comment" => "#shh"})
       {:error, %{"checkin_comment" => "#shh"}}
@@ -50,6 +90,8 @@ defmodule Slacktapped do
   """
   def is_eligible_checkin(checkin) do
     cond do
+      is_nil(checkin["beer"]) ->
+        {:error, checkin}
       is_nil(checkin["checkin_comment"]) ->
         {:ok, checkin}
       String.match?(checkin["checkin_comment"], ~r/#shh/) ->
@@ -59,176 +101,19 @@ defmodule Slacktapped do
     end
   end
 
-  def parse_badge(badge) do
-    "badge"
-  end
+  @doc """
+  Adds an attachment to the checkin's attachments list.
 
-  @doc ~S"""
-  Parses a checkin to a string for Slack.
+  ## Example
 
-  ## Examples
-
-  A typical checkin with a rating and comment:
-
-      iex> Slacktapped.parse_checkin(%{
-      ...>   "user" => %{
-      ...>     "user_name" => "nicksergeant"
-      ...>   },
-      ...>   "beer" => %{
-      ...>     "bid" => 123,
-      ...>     "beer_abv" => 4.5,
-      ...>     "beer_label" => "https://foo.bar/site/beer_logos/label.jpeg",
-      ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa",
-      ...>     "beer_style" => "American IPA"
-      ...>   },
-      ...>   "brewery" => %{
-      ...>     "brewery_id" => 1,
-      ...>     "brewery_name" => "Two Lake"
-      ...>   },
-      ...>   "checkin_comment" => "Lovely!",
-      ...>   "checkin_id" => 567,
-      ...>   "rating_score" => 3.5
-      ...> })
-      {:ok,
-        "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
-        "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
-        "(American IPA, 4.5% ABV) " <>
-        "by <https://untappd.com/brewery/1|Two Lake>.\n" <>
-        "They rated it a 3.5 and said \"Lovely!\" " <>
-        "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
-       "https://foo.bar/site/beer_logos/label.jpeg"}
-
-  A checkin without a rating:
-
-      iex> Slacktapped.parse_checkin(%{"checkin_comment" => "Lovely!"})
-      {:ok,
-        "<https://untappd.com/user/|> is drinking " <>
-        "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.\nThey said \"Lovely!\" " <>
-        "<https://untappd.com/user//checkin/|Toast »>",
-       nil}
-
-  A checkin without a comment:
-
-      iex> Slacktapped.parse_checkin(%{"rating_score" => 1.5})
-      {:ok,
-        "<https://untappd.com/user/|> is drinking " <>
-        "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>.\nThey rated it a 1.5. " <>
-        "<https://untappd.com/user//checkin/|Toast »>",
-       nil}
-
-  A checkin without a comment or rating:
-
-      iex> Slacktapped.parse_checkin(%{})
-      {:ok,
-        "<https://untappd.com/user/|> is drinking " <>
-        "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>. " <>
-        "<https://untappd.com/user//checkin/|Toast »>",
-       nil}
-
-  A checkin with an image:
-
-      iex> Slacktapped.parse_checkin(%{
-      ...>   "media" => %{
-      ...>     "items" => [
-      ...>       %{
-      ...>         "photo" => %{
-      ...>           "photo_id" => 987,
-      ...>           "photo_img_lg" => "https://path/to/image"
-      ...>         }
-      ...>       }
-      ...>     ]
-      ...>   }
-      ...> })
-      {:ok,
-        "<https://untappd.com/user/|> is drinking " <>
-        "<https://untappd.com/b//|> (, % ABV) by " <>
-        "<https://untappd.com/brewery/|>. " <>
-        "<https://untappd.com/user//checkin/|Toast »>",
-       "https://path/to/image"}
-
-  A checkin with a venue:
-
-  ### TODO:
-
-  Show location / venue it was checked into.
-  Add to attachments array on checkin then pipe to slack.post in main()
-  If no user uploaded image, show label instead.
-  {
-    "attachments": [
-        {
-            "fallback": "Image of this checkin.",
-            "color": "#FFCF0B",
-            "pretext": "<http://google.com/to/user|Nick Sergeant> is drinking <http://google.com/path/to/beer|Kirby's Kolsch> at <http://google.com/to/venue|Sampson State Park>.\nThey rated it a 3.5 and said \"Lovely!\" <http://google.com/to/toast|Toast »>",
-            "author_name": "Muskoka Brewery",
-            "author_link": "http://google.com/path/to/brewery",
-            "author_icon": "https://untappd.akamaized.net/site/brewery_logos/brewery-muskoka.jpg",
-            "title": "Kirby's Kolsch",
-            "title_link": "http://google.com/path/to/beer",
-            "text": "Kolsch, 4.6% ABV",
-            "image_url": "https://untappd.akamaized.net/photo/2016_08_28/7d8e03ffe8f258f9db445e17894c2c12_640x640.jpg",
-            "footer": "<http://google.com/to/user|nicksergeant>",
-            "footer_icon": "https://gravatar.com/avatar/a74159ce0c29f89b75a25037e40b27a4?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2.jpg%3Fv%3D1"
-        }
-    ]
-  }
+      iex> Slacktapped.add_attachment({:ok, %{"foo" => "bar"}}, %{"attachments" => []})
+      {:ok, %{"attachments" => [%{"foo" => "bar"}]}}
 
   """
-  def parse_checkin(checkin) do
-    {:ok, user_name} = parse_name(checkin["user"])
-
-    beer_abv = checkin["beer"]["beer_abv"]
-    beer_id = checkin["beer"]["bid"]
-    beer_label = checkin["beer"]["beer_label"]
-    beer_name = checkin["beer"]["beer_name"]
-    beer_slug = checkin["beer"]["beer_slug"]
-    beer_style = checkin["beer"]["beer_style"]
-    brewery_id = checkin["brewery"]["brewery_id"]
-    brewery_name = checkin["brewery"]["brewery_name"]
-    checkin_comment = checkin["checkin_comment"]
-    checkin_id = checkin["checkin_id"]
-    checkin_rating = checkin["rating_score"]
-    user_username = checkin["user"]["user_name"]
-
-    beer = "<https://untappd.com/b/#{beer_slug}/#{beer_id}|#{beer_name}>"
-    brewery = "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>"
-    toast = "<https://untappd.com/user/#{user_username}/checkin/#{checkin_id}|Toast »>"
-    user = "<https://untappd.com/user/#{user_username}|#{user_name}>"
-
-    rating_and_comment = cond do
-      is_binary(checkin_comment)
-        and checkin_comment != ""
-        and is_number(checkin_rating) -> 
-          "\nThey rated it a #{checkin_rating} and said \"#{checkin_comment}\""
-      is_binary(checkin_comment)
-        and checkin_comment != "" ->
-          "\nThey said \"#{checkin_comment}\""
-      is_number(checkin_rating) ->
-        "\nThey rated it a #{checkin_rating}."
-      true -> ""
-    end
-
-    media_items = checkin["media"]["items"]
-
-    image_url = cond do
-      is_list(media_items) and Enum.count(media_items) >= 1 ->
-        media_items
-          |> Enum.at(0)
-          |> get_in(["photo", "photo_img_lg"])
-      true -> beer_label
-    end
-
-    {:ok,
-      "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV) " <>
-      "by #{brewery}.#{rating_and_comment} #{toast}",
-     image_url}
-  end
-
-  def parse_comment(comment) do
-    "comment"
+  def add_attachment({:ok, attachment}, checkin) do
+    new_attachments = checkin["attachments"] ++ [attachment]
+    checkin = Map.put(checkin, "attachments", new_attachments)
+    {:ok, checkin}
   end
 
   @doc """
@@ -264,78 +149,6 @@ defmodule Slacktapped do
       _ ->
         {:ok, "#{user["user_name"]}"}
     end
-  end
-
-  @doc """
-  Parses a badge and posts it to Slack.
-
-  ## Example
-  
-      iex> Slacktapped.process_badge(%{})
-      {:ok, %{}}
-
-  """
-  def process_badge(badge) do
-    parse_badge(badge)
-    {:ok, badge}
-  end
-
-  @doc """
-  Gets all of the badges from a checkin and processes them.
-  """
-  def process_badges(checkin) do
-    get_in(checkin, ["badges", "items"])
-      |> Enum.each(&(process_badge(&1)))
-    {:ok, checkin}
-  end
-
-  @doc ~S"""
-  Parses a checkin and posts it to Slack, if the checkin is eligible.
-
-  Ineligible checkins contain the text "#shh" in the checkin comment. For, you
-  know, day drinking.
-
-  ## Examples
-
-  A normal checkin gets through:
-
-      iex> Slacktapped.process_checkin(%{})
-      {:ok, %{}}
-
-  Checkins with the text "#shh" in the checkin comment are ignored:
-
-      iex> Slacktapped.process_checkin(%{"checkin_comment" => "#shh"})
-      {:error, %{"checkin_comment" => "#shh"}}
-
-  """
-  def process_checkin(checkin) do
-    with {:ok, checkin} <- is_eligible_checkin(checkin),
-         {:ok, message, image_url} <- parse_checkin(checkin),
-         {:ok, _message} <- @slack.post(message, image_url),
-         do: {:ok, checkin}
-  end
-
-  @doc """
-  Parses a comment and posts it to Slack.
-
-  ## Example
-  
-      iex> Slacktapped.process_comment(%{})
-      {:ok, %{}}
-
-  """
-  def process_comment(comment) do
-    parse_comment(comment)
-    {:ok, comment}
-  end
-
-  @doc """
-  Gets all of the comments from a checkin and processes them.
-  """
-  def process_comments(checkin) do
-    get_in(checkin, ["comments", "items"])
-      |> Enum.each(&(process_comment(&1)))
-    {:ok, checkin}
   end
 
 end
