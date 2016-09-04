@@ -17,10 +17,7 @@ defmodule Slacktapped do
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
       |> Enum.take(1) # TODO: Remove for prod.
-      |> Enum.each(fn(checkin) ->
-          with {:ok, checkin} <- handle_checkin(checkin),
-            do: :ok
-        end)
+      |> Enum.each(&(handle_checkin(&1)))
   end
 
   @doc ~S"""
