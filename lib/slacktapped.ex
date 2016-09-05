@@ -8,6 +8,7 @@ defmodule Slacktapped do
     Logger.debug("debug")
     Logger.info("info")
     IO.puts "debug pong"
+
   end
 
   @doc """
