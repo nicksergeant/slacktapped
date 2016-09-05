@@ -14,7 +14,8 @@ defmodule Slacktapped.Mixfile do
     [
       applications: [
         :httpotion,
-        :logger
+        :logger,
+        :quantum
       ]
     ]
   end
@@ -23,7 +24,8 @@ defmodule Slacktapped.Mixfile do
     [
       {:httpotion, "~> 3.0.0"},
       {:mix_test_watch, "~> 0.2", only: :dev},
-      {:poison, "~> 2.0"}
+      {:poison, "~> 2.0"},
+      {:quantum, ">= 1.7.1"}
     ]
   end
 end

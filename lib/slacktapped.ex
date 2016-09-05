@@ -1,6 +1,14 @@
 defmodule Slacktapped do
+  require Logger
+
   @slack Application.get_env(:slacktapped, :slack)
   @untappd Application.get_env(:slacktapped, :untappd)
+
+  def debg do
+    Logger.debug("debug")
+    Logger.info("info")
+    IO.puts "debug pong"
+  end
 
   @doc """
   Fetches checkins from Untappd and then processes each checkin.
@@ -12,12 +20,14 @@ defmodule Slacktapped do
 
   """
   def main do
+    Logger.info("Running...")
     @untappd.get("checkin/recent")
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
       |> Enum.take(3) # TODO: Remove for prod.
       |> Enum.each(&(handle_checkin(&1)))
+    Logger.info("Done.")
   end
 
   @doc ~S"""
@@ -156,5 +166,4 @@ defmodule Slacktapped do
         {:ok, "#{user["user_name"]}"}
     end
   end
-
 end
