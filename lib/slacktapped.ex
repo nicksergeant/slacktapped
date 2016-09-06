@@ -5,10 +5,7 @@ defmodule Slacktapped do
   @untappd Application.get_env(:slacktapped, :untappd)
 
   def debg do
-    Logger.debug("debug")
-    Logger.info("info")
-    IO.puts "debug pong"
-
+    Logger.info("[Slacktapped] debg info")
   end
 
   @doc """
