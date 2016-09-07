@@ -16,7 +16,7 @@ defmodule Slacktapped do
       Plug.Adapters.Cowboy.child_spec(:http, Slacktapped.Router, [], port: port)
     ]
 
-    Logger.info("[Server] Running")
+    Logger.info("[Server] Started")
 
     Supervisor.start_link(children, strategy: :one_for_one)
   end
@@ -31,14 +31,14 @@ defmodule Slacktapped do
 
   """
   def main do
-    Logger.info("Running...")
+    Logger.info("[Processor] Running...")
     @untappd.get("checkin/recent")
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
       |> Enum.take(3) # TODO: Remove for prod.
       |> Enum.each(&(handle_checkin(&1)))
-    Logger.info("Done.")
+    Logger.info("[Processor] Done.")
   end
 
   @doc ~S"""
