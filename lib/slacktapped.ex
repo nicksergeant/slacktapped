@@ -1,11 +1,24 @@
 defmodule Slacktapped do
+  use Application
   require Logger
 
   @slack Application.get_env(:slacktapped, :slack)
   @untappd Application.get_env(:slacktapped, :untappd)
 
   def debg do
-    Logger.info("[Slacktapped] debg info")
+    Logger.info("[Poller] Triggered")
+  end
+
+  def start(_type, _args) do
+    port = Application.get_env(:slacktapped, :cowboy_port, 8080)
+
+    children = [
+      Plug.Adapters.Cowboy.child_spec(:http, Slacktapped.Router, [], port: port)
+    ]
+
+    Logger.info("[Server] Running")
+
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 
   @doc """

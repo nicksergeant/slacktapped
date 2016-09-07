@@ -13,17 +13,22 @@ defmodule Slacktapped.Mixfile do
   def application do
     [
       applications: [
+        :cowboy,
         :httpotion,
         :logger,
+        :plug,
         :quantum
-      ]
+      ],
+      mod: {Slacktapped, []}
     ]
   end
 
   defp deps do
     [
+      {:cowboy, "~> 1.0.0"},
       {:httpotion, "~> 3.0.0"},
       {:mix_test_watch, "~> 0.2", only: :dev},
+      {:plug, "~> 1.0"},
       {:poison, "~> 2.0"},
       {:quantum, ">= 1.7.1"}
     ]
