@@ -10,7 +10,7 @@ defmodule Slacktapped do
   end
 
   def start(_type, _args) do
-    port = Application.get_env(:slacktapped, :cowboy_port, 8080)
+    port = Application.get_env(:slacktapped, :cowboy_port, 8000)
 
     children = [
       Plug.Adapters.Cowboy.child_spec(:http, Slacktapped.Router, [], port: port)
