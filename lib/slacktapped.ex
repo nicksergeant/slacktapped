@@ -36,7 +36,7 @@ defmodule Slacktapped do
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
-      |> Enum.take(3) # TODO: Remove for prod.
+      |> Enum.take(1) # TODO: Remove for prod.
       |> Enum.each(&(handle_checkin(&1)))
     Logger.info("[Processor] Done.")
   end
