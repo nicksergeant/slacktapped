@@ -4,7 +4,7 @@ defmodule Slacktapped.Router do
   plug :match
   plug :dispatch
 
-  get "/", do: send_resp(conn, 200, "Hi")
+  get "/", do: send_resp(conn, 200, "Yessum?")
 
   match _ do
     send_resp(conn, 404, "Page not found.")

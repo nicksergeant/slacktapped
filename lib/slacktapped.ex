@@ -27,7 +27,7 @@ defmodule Slacktapped do
 
   """
   def main do
-    Logger.info("[Processor] Running... (1)")
+    Logger.info("[Processor] Running...")
     @untappd.get("checkin/recent")
       |> Map.fetch!(:body)
       |> Poison.decode!
