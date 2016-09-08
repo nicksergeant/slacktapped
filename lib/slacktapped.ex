@@ -6,7 +6,7 @@ defmodule Slacktapped do
   @untappd Application.get_env(:slacktapped, :untappd)
 
   def debg do
-    Logger.info("[Poller] Triggered (1.0)")
+    Logger.info("[Poller] Triggered (1)")
   end
 
   def start(_type, _args) do
