@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :quantum, cron: [
-  "* * * * *": {Slacktapped, :debg}
+  "* * * * *": {Slacktapped, :main}
 ]
 
 import_config "#{Mix.env}.exs"

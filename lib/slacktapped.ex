@@ -5,10 +5,6 @@ defmodule Slacktapped do
   @slack Application.get_env(:slacktapped, :slack)
   @untappd Application.get_env(:slacktapped, :untappd)
 
-  def debg do
-    Logger.info("[Poller] Triggered (1)")
-  end
-
   def start(_type, _args) do
     port = Application.get_env(:slacktapped, :cowboy_port, 8000)
 
