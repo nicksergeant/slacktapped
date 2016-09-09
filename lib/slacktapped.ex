@@ -44,7 +44,6 @@ defmodule Slacktapped do
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
-      |> Enum.take(1) # TODO: Remove for prod.
       |> Enum.map(&(handle_checkin(&1)))
       |> Enum.reduce([], fn({:ok, checkin}, acc) ->
           acc ++ checkin["attachments"]
