@@ -11,4 +11,4 @@ config :slacktapped,
   redis_host: System.get_env("REDIS_HOST"),
   redis_port: 6379,
   slack: Slacktapped.Slack.Live,
-  untappd: Slacktapped.Untappd.Mock
+  untappd: Slacktapped.Untappd.Live
