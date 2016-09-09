@@ -1,6 +1,7 @@
 use Mix.Config
 
 config :slacktapped,
+  instance_name: "test",
   redis: Slacktapped.Redis.Mock,
   redis_host: "localhost",
   redis_port: 6379,

@@ -6,6 +6,7 @@ config :quantum, cron: [
 
 config :slacktapped,
   cowboy_port: 5000,
+  instance_name: System.get_env("INSTANCE_NAME"),
   redis: Slacktapped.Redis.Live,
   redis_host: System.get_env("REDIS_HOST"),
   redis_port: 6379,

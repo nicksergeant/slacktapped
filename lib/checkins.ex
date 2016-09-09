@@ -269,9 +269,43 @@ defmodule Slacktapped.Checkins do
     }}
   end
 
-  def r(arg) do @redis.command(arg) end
+  @doc """
+  Reports that a checkin was posted to Slack by setting a Redis key. There are
+  two possible Redis keys indicating a post was made:
 
-  def report_checkin_type({:ok, checkin}) do
+  1. <slacktapped-instance-name>:<checkin_id>:with-image
+  2. <slacktapped-instance-name>:<checkin_id>:without-image
+
+  Already-posted checkins that were previously posted without an image are
+  posted again indicating that the user added an image to the checkin. If a
+  record exists for the checkin with an image, the checkin is not posted again.
+
+  Examples
+  
+      iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{}})
+      {:ok, %{"reported_as" => "without-image"}}
+  
+      # iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{
+      # ...>   "image_url" => "http://foo/bar"
+      # ...> }})
+      # {:ok, %{"reported_as" => "with-image"}}
+
+  """
+  def report_checkin_type({:ok, checkin, attachment}) do
+    checkin_id = checkin["checkin_id"]
+    instance_name = Application.get_env(:slacktapped, :instance_name)
+
+    reported_as = cond do
+      is_binary(attachment["image_url"]) ->
+        @redis.command("SET #{instance_name}:#{checkin_id}:with-image 1")
+        "with-image"
+      true ->
+        @redis.command("SET #{instance_name}:#{checkin_id}:without-image 1")
+        "without-image"
+    end
+
+    checkin = Map.put(checkin, "reported_as", reported_as)
+
     {:ok, checkin}
   end
 end

@@ -1,5 +1,5 @@
 defmodule Slacktapped.Redis.Mock do
   def command(command) do
-    {:ok, "OK"}
+    {:ok, command}
   end
 end

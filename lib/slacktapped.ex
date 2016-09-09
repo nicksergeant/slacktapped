@@ -68,6 +68,7 @@ defmodule Slacktapped do
       {:ok,
         %{
           "beer" => %{},
+          "reported_as" => "without-image",
           "attachments" => [
             %{
               "author_icon" => nil,
@@ -145,13 +146,13 @@ defmodule Slacktapped do
   ## Example
 
       iex> Slacktapped.add_attachment({:ok, %{"foo" => "bar"}}, %{"attachments" => []})
-      {:ok, %{"attachments" => [%{"foo" => "bar"}]}}
+      {:ok, %{"attachments" => [%{"foo" => "bar"}]}, %{"foo" => "bar"}}
 
   """
   def add_attachment({:ok, attachment}, checkin) do
     new_attachments = checkin["attachments"] ++ [attachment]
     checkin = Map.put(checkin, "attachments", new_attachments)
-    {:ok, checkin}
+    {:ok, checkin, attachment}
   end
 
   @doc """
