@@ -17,7 +17,8 @@ defmodule Slacktapped.Mixfile do
         :httpotion,
         :logger,
         :plug,
-        :quantum
+        :quantum,
+        :redix
       ],
       mod: {Slacktapped, []}
     ]
@@ -30,6 +31,7 @@ defmodule Slacktapped.Mixfile do
       {:mix_test_watch, "~> 0.2", only: :dev},
       {:plug, "~> 1.0"},
       {:poison, "~> 2.0"},
+      {:redix, ">= 0.4.0"},
       {:quantum, ">= 1.7.1"}
     ]
   end

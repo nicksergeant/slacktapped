@@ -1,15 +1,25 @@
 defmodule Slacktapped do
-  use Application
+  import Supervisor.Spec
   require Logger
+  use Application
 
   @slack Application.get_env(:slacktapped, :slack)
   @untappd Application.get_env(:slacktapped, :untappd)
 
   def start(_type, _args) do
-    port = Application.get_env(:slacktapped, :cowboy_port, 8000)
+    cowboy_port = Application.get_env(:slacktapped, :cowboy_port, 8000)
+    redis_host = Application.get_env(:slacktapped, :redis_host, "localhost")
+    redis_port = Application.get_env(:slacktapped, :redis_port, 6379)
 
     children = [
-      Plug.Adapters.Cowboy.child_spec(:http, Slacktapped.Router, [], port: port)
+      Plug.Adapters.Cowboy.child_spec(:http, Slacktapped.Router, [], port: cowboy_port),
+      worker(Redix, [
+        [
+          host: redis_host,
+          port: redis_port
+        ],
+        [name: :redix]
+      ])
     ]
 
     Logger.info("[Server] Started")
@@ -32,7 +42,7 @@ defmodule Slacktapped do
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
-      |> Enum.take(5) # TODO: Remove for prod.
+      |> Enum.take(1) # TODO: Remove for prod.
       |> Enum.map(&(handle_checkin(&1)))
       |> Enum.reduce([], fn({:ok, checkin}, acc) ->
           acc ++ checkin["attachments"]
@@ -94,6 +104,8 @@ defmodule Slacktapped do
 
     with {:ok, checkin} <- is_eligible_checkin(checkin),
          {:ok, checkin} <- Slacktapped.Checkins.process_checkin(checkin),
+         # {:ok, checkin} <- Slacktapped.Checkins.process_badges(checkin),
+         # {:ok, checkin} <- Slacktapped.Checkins.process_comments(checkin),
          do: {:ok, checkin}
   end
 

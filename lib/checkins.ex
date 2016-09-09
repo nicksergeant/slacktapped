@@ -1,10 +1,13 @@
 defmodule Slacktapped.Checkins do
+  @redis Application.get_env(:slacktapped, :redis)
+
   @doc """
   Parses a checkin into an attachment for Slack.
   """
   def process_checkin(checkin) do
-    Slacktapped.Checkins.parse_checkin(checkin)
+    parse_checkin(checkin)
       |> Slacktapped.add_attachment(checkin)
+      |> Slacktapped.Checkins.report_checkin_type
   end
 
   @doc ~S"""
@@ -246,6 +249,11 @@ defmodule Slacktapped.Checkins do
       true -> beer_label
     end
 
+    # Switch here on redis.get:
+    #  homebrewchat:<checkinid>:withimage > nil
+    #  homebrewchat:<checkinid> > image only post
+    #  homebrewchat:nil > whole post
+
     {:ok, %{
       "author_icon" => user_avatar,
       "author_link" => "https://untappd.com/user/#{user_username}",
@@ -259,5 +267,11 @@ defmodule Slacktapped.Checkins do
       "title" => beer_name,
       "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
     }}
+  end
+
+  def r(arg) do @redis.command(arg) end
+
+  def report_checkin_type({:ok, checkin}) do
+    {:ok, checkin}
   end
 end
