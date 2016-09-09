@@ -1,4 +1,5 @@
 defmodule Slacktapped.Checkins do
+  @instance_name Application.get_env(:slacktapped, :instance_name)
   @redis Application.get_env(:slacktapped, :redis)
 
   @doc """
@@ -195,6 +196,40 @@ defmodule Slacktapped.Checkins do
         }
       }
 
+  A checkin with an image, with a previously-posted checkin with no image:
+
+      iex> Slacktapped.Checkins.parse_checkin(%{
+      ...>   "checkin_id" => 5566,
+      ...>   "media" => %{
+      ...>     "items" => [
+      ...>       %{
+      ...>         "photo" => %{
+      ...>           "photo_id" => 987,
+      ...>           "photo_img_lg" => "http://path/to/beer/image"
+      ...>         }
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> })
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/user/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/brewery/|>",
+          "footer_icon" => nil,
+          "image_url" => "http://path/to/beer/image",
+          "text" => "" <>
+            "<https://untappd.com/user/|> added an image to " <>
+            "<https://untappd.com/user//checkin/5566|their checkin> of " <>
+            "<https://untappd.com/b//|>.",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
+        }
+      }
+
   """
   def parse_checkin(checkin) do
     {:ok, user_name} = Slacktapped.parse_name(checkin["user"])
@@ -232,27 +267,33 @@ defmodule Slacktapped.Checkins do
       true -> ""
     end
 
-    venue = cond do
-      is_map(checkin["venue"]) ->
-        venue_id = checkin["venue"]["venue_id"]
-        venue_name = checkin["venue"]["venue_name"]
-        venue_slug = checkin["venue"]["venue_slug"]
-        " at <https://untappd.com/v/#{venue_slug}/#{venue_id}|#{venue_name}>"
-      true -> ""
+    venue = if is_map(checkin["venue"]) do
+      venue_id = checkin["venue"]["venue_id"]
+      venue_name = checkin["venue"]["venue_name"]
+      venue_slug = checkin["venue"]["venue_slug"]
+      " at <https://untappd.com/v/#{venue_slug}/#{venue_id}|#{venue_name}>"
     end
 
-    image_url = cond do
-      is_list(media_items) and Enum.count(media_items) >= 1 ->
-        media_items
-          |> Enum.at(0)
-          |> get_in(["photo", "photo_img_lg"])
-      true -> beer_label
+    image_url = if is_list(media_items) and Enum.count(media_items) >= 1 do
+      media_items
+        |> Enum.at(0)
+        |> get_in(["photo", "photo_img_lg"])
+    else
+      beer_label
     end
 
-    # Switch here on redis.get:
-    #  homebrewchat:<checkinid>:withimage > nil
-    #  homebrewchat:<checkinid> > image only post
-    #  homebrewchat:nil > whole post
+    # If we have an image and there was already a post for this checkin
+    # *without* an image, only indicate that an image was added.
+    cmd = "GET #{@instance_name}:#{checkin_id}:without-image"
+    text = if is_binary(image_url) and
+        @redis.command(cmd) == {:ok, "1"} do
+      "#{user} added an image to " <>
+      "<https://untappd.com/user/#{user_username}/checkin/#{checkin_id}|" <>
+      "their checkin> of #{beer}."
+    else
+      "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV)" <>
+      "#{venue}.#{rating_and_comment} #{toast}"
+    end
 
     {:ok, %{
       "author_icon" => user_avatar,
@@ -263,7 +304,7 @@ defmodule Slacktapped.Checkins do
       "footer" => "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>",
       "footer_icon" => brewery_label,
       "image_url" => image_url,
-      "text" => "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV)#{venue}.#{rating_and_comment} #{toast}",
+      "text" => text,
       "title" => beer_name,
       "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
     }}
@@ -285,22 +326,21 @@ defmodule Slacktapped.Checkins do
       iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{}})
       {:ok, %{"reported_as" => "without-image"}}
   
-      # iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{
-      # ...>   "image_url" => "http://foo/bar"
-      # ...> }})
-      # {:ok, %{"reported_as" => "with-image"}}
+      iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{
+      ...>   "image_url" => "http://foo/bar"
+      ...> }})
+      {:ok, %{"reported_as" => "with-image"}}
 
   """
   def report_checkin_type({:ok, checkin, attachment}) do
     checkin_id = checkin["checkin_id"]
-    instance_name = Application.get_env(:slacktapped, :instance_name)
 
     reported_as = cond do
       is_binary(attachment["image_url"]) ->
-        @redis.command("SET #{instance_name}:#{checkin_id}:with-image 1")
+        @redis.command("SET #{@instance_name}:#{checkin_id}:with-image 1")
         "with-image"
       true ->
-        @redis.command("SET #{instance_name}:#{checkin_id}:without-image 1")
+        @redis.command("SET #{@instance_name}:#{checkin_id}:without-image 1")
         "without-image"
     end
 
