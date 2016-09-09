@@ -39,13 +39,13 @@ defmodule Slacktapped.Checkins do
       ...> })
       {:ok,
         %{
-          "author_icon" => "http://path/to/brewery/label",
-          "author_link" => "https://untappd.com/brewery/1",
-          "author_name" => "Two Lake",
+          "author_icon" => "http://path/to/user/avatar",
+          "author_link" => "https://untappd.com/user/nicksergeant",
+          "author_name" => "nicksergeant",
           "color" => "#FFCF0B",
           "fallback" => "Image of this checkin.",
-          "footer" => "<https://untappd.com/user/nicksergeant|nicksergeant>",
-          "footer_icon" => "http://path/to/user/avatar",
+          "footer" => "<https://untappd.com/brewery/1|Two Lake>",
+          "footer_icon" => "http://path/to/brewery/label",
           "image_url" => "http://path/to/beer/label",
           "text" => "" <>
             "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
@@ -67,11 +67,11 @@ defmodule Slacktapped.Checkins do
       {:ok,
         %{
           "author_icon" => nil,
-          "author_link" => "https://untappd.com/brewery/",
+          "author_link" => "https://untappd.com/user/",
           "author_name" => nil,
           "color" => "#FFCF0B",
           "fallback" => "Image of this checkin.",
-          "footer" => "<https://untappd.com/user/|>",
+          "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
           "text" => "" <>
@@ -90,11 +90,11 @@ defmodule Slacktapped.Checkins do
       {:ok,
         %{
           "author_icon" => nil,
-          "author_link" => "https://untappd.com/brewery/",
+          "author_link" => "https://untappd.com/user/",
           "author_name" => nil,
           "color" => "#FFCF0B",
           "fallback" => "Image of this checkin.",
-          "footer" => "<https://untappd.com/user/|>",
+          "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
           "text" => "" <>
@@ -113,11 +113,11 @@ defmodule Slacktapped.Checkins do
       {:ok,
         %{
           "author_icon" => nil,
-          "author_link" => "https://untappd.com/brewery/",
+          "author_link" => "https://untappd.com/user/",
           "author_name" => nil,
           "color" => "#FFCF0B",
           "fallback" => "Image of this checkin.",
-          "footer" => "<https://untappd.com/user/|>",
+          "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
           "text" => "" <>
@@ -146,11 +146,11 @@ defmodule Slacktapped.Checkins do
       {:ok,
         %{
           "author_icon" => nil,
-          "author_link" => "https://untappd.com/brewery/",
+          "author_link" => "https://untappd.com/user/",
           "author_name" => nil,
           "color" => "#FFCF0B",
           "fallback" => "Image of this checkin.",
-          "footer" => "<https://untappd.com/user/|>",
+          "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => "http://path/to/beer/image",
           "text" => "" <>
@@ -175,11 +175,11 @@ defmodule Slacktapped.Checkins do
       {:ok,
         %{
           "author_icon" => nil,
-          "author_link" => "https://untappd.com/brewery/",
+          "author_link" => "https://untappd.com/user/",
           "author_name" => nil,
           "color" => "#FFCF0B",
           "fallback" => "Image of this checkin.",
-          "footer" => "<https://untappd.com/user/|>",
+          "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
           "text" => "" <>
@@ -247,13 +247,13 @@ defmodule Slacktapped.Checkins do
     end
 
     {:ok, %{
-      "author_icon" => brewery_label,
-      "author_link" => "https://untappd.com/brewery/#{brewery_id}",
-      "author_name" => brewery_name,
+      "author_icon" => user_avatar,
+      "author_link" => "https://untappd.com/user/#{user_username}",
+      "author_name" => user_username,
       "color" => "#FFCF0B",
       "fallback" => "Image of this checkin.",
-      "footer" => "<https://untappd.com/user/#{user_username}|#{user_username}>",
-      "footer_icon" => user_avatar,
+      "footer" => "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>",
+      "footer_icon" => brewery_label,
       "image_url" => image_url,
       "text" => "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV)#{venue}.#{rating_and_comment} #{toast}",
       "title" => beer_name,

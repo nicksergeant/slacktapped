@@ -32,8 +32,12 @@ defmodule Slacktapped do
       |> Map.fetch!(:body)
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
-      |> Enum.take(1) # TODO: Remove for prod.
-      |> Enum.each(&(handle_checkin(&1)))
+      |> Enum.take(5) # TODO: Remove for prod.
+      |> Enum.map(&(handle_checkin(&1)))
+      |> Enum.reduce([], fn({:ok, checkin}, acc) ->
+          acc ++ checkin["attachments"]
+        end)
+      |> @slack.post
     Logger.info("[Processor] Done.")
   end
 
@@ -57,11 +61,11 @@ defmodule Slacktapped do
           "attachments" => [
             %{
               "author_icon" => nil,
-              "author_link" => "https://untappd.com/brewery/",
+              "author_link" => "https://untappd.com/user/",
               "author_name" => nil,
               "color" => "#FFCF0B",
               "fallback" => "Image of this checkin.",
-              "footer" => "<https://untappd.com/user/|>",
+              "footer" => "<https://untappd.com/brewery/|>",
               "footer_icon" => nil,
               "image_url" => nil,
               "text" => "<https://untappd.com/user/|> is drinking " <>
@@ -90,7 +94,6 @@ defmodule Slacktapped do
 
     with {:ok, checkin} <- is_eligible_checkin(checkin),
          {:ok, checkin} <- Slacktapped.Checkins.process_checkin(checkin),
-         {:ok, checkin} <- @slack.post(checkin),
          do: {:ok, checkin}
   end
 
