@@ -6,7 +6,7 @@ defmodule Slacktapped.Untappd.Live do
   end
 
   defp api_url(path) when is_binary(path) do
-    access_token = System.get_env("UNTAPPD_AUTH_TOKEN")
+    access_token = System.get_env("UNTAPPD_ACCESS_TOKEN")
     client_id = System.get_env("UNTAPPD_CLIENT_ID")
     client_secret = System.get_env("UNTAPPD_CLIENT_SECRET")
 
