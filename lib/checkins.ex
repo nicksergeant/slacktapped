@@ -219,6 +219,28 @@ defmodule Slacktapped.Checkins do
         }
       }
 
+  A checkin with a rating of 0:
+
+      iex> Slacktapped.Checkins.parse_checkin(%{"rating_score" => 0})
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/user/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/brewery/|>",
+          "footer_icon" => nil,
+          "image_url" => nil,
+          "text" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|> (, % ABV).\n" <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
+        }
+      }
+
   A checkin with an image:
 
       iex> Slacktapped.Checkins.parse_checkin(%{
@@ -375,7 +397,7 @@ defmodule Slacktapped.Checkins do
       is_binary(checkin_comment)
         and checkin_comment != "" ->
           "\nThey said \"#{checkin_comment}\""
-      is_number(checkin_rating) ->
+      is_number(checkin_rating) and checkin_rating > 0 ->
         "\nThey rated it a #{checkin_rating}."
       true -> ""
     end
