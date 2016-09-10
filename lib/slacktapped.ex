@@ -133,7 +133,6 @@ defmodule Slacktapped do
 
   """
   def is_eligible_checkin(checkin) do
-    checkin_id = checkin["checkin_id"] || ""
     checkin_comment = checkin["checkin_comment"] || ""
 
     cond do
