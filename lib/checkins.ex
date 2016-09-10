@@ -141,7 +141,7 @@ defmodule Slacktapped.Checkins do
             "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
             "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
             "(American IPA, 4.5% ABV)." <>
-            "\nThey rated it a 3.5 and said \"Lovely!\" " <>
+            "\nThey rated it a 3.5 and said \"Lovely!\"\n" <>
             "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
           "title" => "IPA",
           "title_link" => "https://untappd.com/b/two-lake-ipa/123"
@@ -167,7 +167,7 @@ defmodule Slacktapped.Checkins do
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV)." <>
-            "\nThey said \"Lovely!\" " <>
+            "\nThey said \"Lovely!\"\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -190,7 +190,7 @@ defmodule Slacktapped.Checkins do
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV)." <>
-            "\nThey rated it a 1.5. " <>
+            "\nThey rated it a 1.5.\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -212,7 +212,7 @@ defmodule Slacktapped.Checkins do
           "image_url" => nil,
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV). " <>
+            "<https://untappd.com/b//|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -245,7 +245,7 @@ defmodule Slacktapped.Checkins do
           "image_url" => "http://path/to/beer/image",
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV). " <>
+            "<https://untappd.com/b//|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -275,7 +275,7 @@ defmodule Slacktapped.Checkins do
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV) " <>
-            "at <https://untappd.com/v/venue-slug/789|Venue Name>. " <>
+            "at <https://untappd.com/v/venue-slug/789|Venue Name>.\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -336,7 +336,7 @@ defmodule Slacktapped.Checkins do
           "image_url" => "",
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV). " <>
+            "<https://untappd.com/b//|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -407,7 +407,7 @@ defmodule Slacktapped.Checkins do
       "their checkin> of #{beer}."
     else
       "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV)" <>
-      "#{venue}.#{rating_and_comment} #{toast}"
+      "#{venue}.#{rating_and_comment}\n#{toast}"
     end
 
     {:ok, %{
