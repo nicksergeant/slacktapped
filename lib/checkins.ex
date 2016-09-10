@@ -323,20 +323,43 @@ defmodule Slacktapped.Checkins do
 
   Examples
   
-      iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{}})
+      iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}})
       {:ok, %{"reported_as" => "without-image"}}
   
-      iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}, %{
-      ...>   "image_url" => "http://foo/bar"
+      iex> Slacktapped.Checkins.report_checkin_type({:ok, %{
+      ...>   "media" => %{
+      ...>     "items" => [
+      ...>       %{
+      ...>         "photo" => %{
+      ...>           "photo_id" => 987,
+      ...>           "photo_img_lg" => "http://path/to/beer/image"
+      ...>         }
+      ...>       }
+      ...>     ]
+      ...>   }
       ...> }})
-      {:ok, %{"reported_as" => "with-image"}}
+      {:ok, %{
+        "reported_as" => "with-image",
+        "media" => %{
+          "items" => [
+            %{
+              "photo" => %{
+                "photo_id" => 987,
+                "photo_img_lg" => "http://path/to/beer/image"
+              }
+            }
+          ]
+        }
+      }}
 
   """
-  def report_checkin_type({:ok, checkin, attachment}) do
+  def report_checkin_type({:ok, checkin}) do
     checkin_id = checkin["checkin_id"]
+    media_items = checkin["media"]["items"]
+    has_image = is_list(media_items) and Enum.count(media_items) >= 1
 
     reported_as = cond do
-      is_binary(attachment["image_url"]) ->
+      has_image == true ->
         @redis.command("SET #{@instance_name}:#{checkin_id}:with-image 1")
         "with-image"
       true ->
