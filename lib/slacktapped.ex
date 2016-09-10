@@ -45,7 +45,7 @@ defmodule Slacktapped do
       |> Poison.decode!
       |> get_in(["response", "checkins", "items"])
       |> Enum.map(&(handle_checkin(&1)))
-      |> Enum.reduce([], fn({_, checkin}, acc) ->
+      |> Enum.reduce([], fn({_ok, checkin}, acc) ->
           acc ++ checkin["attachments"]
         end)
       |> @slack.post
