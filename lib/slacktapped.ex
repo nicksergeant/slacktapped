@@ -3,7 +3,8 @@ defmodule Slacktapped do
   require Logger
   use Application
 
-  @instance_name Application.get_env(:slacktapped, :instance_name)
+  @instance_name System.get_env("INSTANCE_NAME") ||
+    Application.get_env(:slacktapped, :instance_name)
   @redis Application.get_env(:slacktapped, :redis)
   @slack Application.get_env(:slacktapped, :slack)
   @untappd Application.get_env(:slacktapped, :untappd)

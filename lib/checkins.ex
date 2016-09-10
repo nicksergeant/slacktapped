@@ -1,5 +1,6 @@
 defmodule Slacktapped.Checkins do
-  @instance_name Application.get_env(:slacktapped, :instance_name)
+  @instance_name System.get_env("INSTANCE_NAME") ||
+    Application.get_env(:slacktapped, :instance_name)
   @redis Application.get_env(:slacktapped, :redis)
 
   @doc """
