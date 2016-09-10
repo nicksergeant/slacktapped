@@ -4,12 +4,97 @@ defmodule Slacktapped.Checkins do
   @redis Application.get_env(:slacktapped, :redis)
 
   @doc """
-  Parses a checkin into an attachment for Slack.
+  Processes a checkin for use in a Slack post:
+
+  1. Verifies the checkin is eligible to post.
+  2. Parses the checkin to a Slack attachment.
+  3. Adds the attachment to the checkin.
+  4. Reports the checkin post to Redis.
   """
   def process_checkin(checkin) do
-    parse_checkin(checkin)
-      |> Slacktapped.add_attachment(checkin)
-      |> Slacktapped.Checkins.report_checkin_type
+    with {:ok, checkin} <- is_eligible_checkin_post(checkin),
+         {:ok, attachment} <- parse_checkin(checkin),
+         {:ok, checkin} <- Slacktapped.add_attachment({:ok, attachment}, checkin),
+         {:ok, checkin} <- report_checkin_type({:ok, checkin}),
+         do: {:ok, checkin}
+  end
+
+  @doc """
+  Determines if a checkin is eligible to be posted to Slack.
+
+  Checkin is ineligible to post if:
+
+  1. There is a Redis key indicating that this checkin was posted under this
+     instance, and had an image with it.
+  2. There is a Redis key indicating that this checkin was posted under this
+     instance, and had no image with it, but the checkin we see now still does
+     not have an image.
+
+  ## Examples
+
+  A checkin that was not already posted:
+
+      iex> Slacktapped.Checkins.is_eligible_checkin_post(%{"checkin_id" => 9985})
+      {:ok, %{"checkin_id" => 9985}}
+
+  A checkin that was already posted, and had an image:
+
+      iex> Slacktapped.Checkins.is_eligible_checkin_post(%{"checkin_id" => 9988})
+      {:error, %{"checkin_id" => 9988}}
+
+  A checkin that was already posted and had no image, and we do not currently
+  have an image:
+
+      iex> Slacktapped.Checkins.is_eligible_checkin_post(%{"beer" => %{}, "checkin_id" => 5566})
+      {:error, %{"beer" => %{}, "checkin_id" => 5566}}
+
+  A checkin that was already posted and had no image, and we now have an
+  image:
+
+      iex> Slacktapped.Checkins.is_eligible_checkin_post(%{
+      ...>   "beer" => %{},
+      ...>   "checkin_id" => 5566,
+      ...>   "media" => %{
+      ...>     "items" => [
+      ...>       %{
+      ...>         "photo" => %{
+      ...>           "photo_id" => 987,
+      ...>           "photo_img_lg" => "http://path/to/beer/image"
+      ...>         }
+      ...>       }
+      ...>     ]
+      ...>   }
+      ...> })
+      {:ok, %{
+        "beer" => %{},
+        "checkin_id" => 5566,
+        "media" => %{
+          "items" => [
+            %{
+              "photo" => %{
+                "photo_id" => 987,
+                "photo_img_lg" => "http://path/to/beer/image"
+              }
+            }
+          ]
+        }
+      }}
+
+  """
+  def is_eligible_checkin_post(checkin) do
+    checkin_id = checkin["checkin_id"] || ""
+    media_items = checkin["media"]["items"]
+    has_image = is_list(media_items) and Enum.count(media_items) >= 1
+    get_key = "GET #{@instance_name}:#{checkin_id}"
+
+    cond do
+      @redis.command("#{get_key}:with-image") == {:ok, "1"} ->
+        {:error, checkin}
+      @redis.command("#{get_key}:without-image") == {:ok, "1"} and not has_image ->
+        {:error, checkin}
+      true ->
+        {:ok, checkin}
+    end
   end
 
   @doc ~S"""
