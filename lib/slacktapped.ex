@@ -107,7 +107,7 @@ defmodule Slacktapped do
 
     with {:ok, checkin} <- is_eligible_checkin(checkin),
          {_ok, checkin} <- Slacktapped.Checkins.process_checkin(checkin),
-         # {:ok, checkin} <- Slacktapped.Checkins.process_badges(checkin),
+         {_ok, checkin} <- Slacktapped.Badges.process_badges(checkin),
          # {:ok, checkin} <- Slacktapped.Checkins.process_comments(checkin),
          do: {:ok, checkin}
   end
@@ -150,12 +150,15 @@ defmodule Slacktapped do
 
   ## Example
 
-      iex> Slacktapped.add_attachment({:ok, %{"foo" => "bar"}}, %{"attachments" => []})
+      iex> Slacktapped.add_attachments([%{"foo" => "bar"}], %{"attachments" => []})
       {:ok, %{"attachments" => [%{"foo" => "bar"}]}}
 
+      iex> Slacktapped.add_attachments([%{"foo" => "bar"}, %{"wat" => "ba"}], %{"attachments" => []})
+      {:ok, %{"attachments" => [%{"foo" => "bar"}, %{"wat" => "ba"}]}}
+
   """
-  def add_attachment({:ok, attachment}, checkin) do
-    new_attachments = checkin["attachments"] ++ [attachment]
+  def add_attachments(attachments, checkin) do
+    new_attachments = checkin["attachments"] ++ attachments
     checkin = Map.put(checkin, "attachments", new_attachments)
     {:ok, checkin}
   end

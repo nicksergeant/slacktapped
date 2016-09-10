@@ -14,7 +14,7 @@ defmodule Slacktapped.Checkins do
   def process_checkin(checkin) do
     with {:ok, checkin} <- is_eligible_checkin_post(checkin),
          {:ok, attachment} <- parse_checkin(checkin),
-         {:ok, checkin} <- Slacktapped.add_attachment({:ok, attachment}, checkin),
+         {:ok, checkin} <- Slacktapped.add_attachments([attachment], checkin),
          {:ok, checkin} <- report_checkin_type({:ok, checkin}),
          do: {:ok, checkin}
   end
@@ -458,7 +458,7 @@ defmodule Slacktapped.Checkins do
   posted again indicating that the user added an image to the checkin. If a
   record exists for the checkin with an image, the checkin is not posted again.
 
-  Examples
+  ## Examples
   
       iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}})
       {:ok, %{"reported_as" => "without-image"}}
