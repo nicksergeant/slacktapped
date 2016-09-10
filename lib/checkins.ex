@@ -231,6 +231,33 @@ defmodule Slacktapped.Checkins do
         }
       }
 
+  The default Untappd beer label is ignored:
+
+      iex> Slacktapped.Checkins.parse_checkin(%{
+      ...>   "attachments" => [],
+      ...>   "beer" => %{
+      ...>     "beer_label" => "https://untappd.akamaized.net/site/assets/images/temp/badge-beer-default.png"
+      ...>   }
+      ...> })
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/user/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/brewery/|>",
+          "footer_icon" => nil,
+          "image_url" => "",
+          "text" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|> (, % ABV). " <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
+        }
+      }
+
   """
   def parse_checkin(checkin) do
     {:ok, user_name} = Slacktapped.parse_name(checkin["user"])
@@ -275,12 +302,14 @@ defmodule Slacktapped.Checkins do
       " at <https://untappd.com/v/#{venue_slug}/#{venue_id}|#{venue_name}>"
     end
 
-    image_url = if is_list(media_items) and Enum.count(media_items) >= 1 do
-      media_items
-        |> Enum.at(0)
-        |> get_in(["photo", "photo_img_lg"])
-    else
-      beer_label
+    image_url = cond do
+      is_list(media_items) and Enum.count(media_items) >= 1 ->
+        media_items
+          |> Enum.at(0)
+          |> get_in(["photo", "photo_img_lg"])
+      beer_label != "https://untappd.akamaized.net/site/assets/images/temp/badge-beer-default.png" ->
+        beer_label
+      true -> ""
     end
 
     # If we have an image and there was already a post for this checkin
