@@ -10,10 +10,6 @@ defmodule Slacktapped.Untappd.Live do
     client_id = System.get_env("UNTAPPD_CLIENT_ID")
     client_secret = System.get_env("UNTAPPD_CLIENT_SECRET")
 
-    url = "https://api.untappd.com/v4/#{path}?client_id=#{client_id}&client_secret=#{client_secret}&access_token=#{access_token}"
-
-    Logger.info(url)
-
-    url
+    "https://api.untappd.com/v4/#{path}?client_id=#{client_id}&client_secret=#{client_secret}&access_token=#{access_token}"
   end
 end
