@@ -14,7 +14,7 @@ defmodule Slacktapped.Checkins do
   def process_checkin(checkin) do
     with {:ok, checkin} <- is_eligible_checkin_post(checkin),
          {:ok, attachment} <- parse_checkin(checkin),
-         {:ok, checkin} <- Slacktapped.add_attachments([attachment], checkin),
+         {:ok, checkin} <- Slacktapped.Utils.add_attachments([attachment], checkin),
          {:ok, checkin} <- report_checkin_type({:ok, checkin}),
          do: {:ok, checkin}
   end
@@ -367,38 +367,18 @@ defmodule Slacktapped.Checkins do
 
   """
   def parse_checkin(checkin) do
-    {:ok, user_name} = Slacktapped.parse_name(checkin["user"])
-
-    beer_abv = checkin["beer"]["beer_abv"]
-    beer_id = checkin["beer"]["bid"]
-    beer_label = checkin["beer"]["beer_label"]
-    beer_name = checkin["beer"]["beer_name"]
-    beer_slug = checkin["beer"]["beer_slug"]
-    beer_style = checkin["beer"]["beer_style"]
-    brewery_id = checkin["brewery"]["brewery_id"]
-    brewery_name = checkin["brewery"]["brewery_name"]
-    brewery_label = checkin["brewery"]["brewery_label"]
-    checkin_comment = checkin["checkin_comment"]
-    checkin_id = checkin["checkin_id"]
-    checkin_rating = checkin["rating_score"]
-    media_items = checkin["media"]["items"]
-    user_avatar = checkin["user"]["user_avatar"]
-    user_username = checkin["user"]["user_name"]
-
-    beer = "<https://untappd.com/b/#{beer_slug}/#{beer_id}|#{beer_name}>"
-    toast = "<https://untappd.com/user/#{user_username}/checkin/#{checkin_id}|Toast »>"
-    user = "<https://untappd.com/user/#{user_username}|#{user_name}>"
+    c = Slacktapped.Utils.checkin_parts(checkin)
 
     rating_and_comment = cond do
-      is_binary(checkin_comment)
-        and checkin_comment != ""
-        and is_number(checkin_rating) -> 
-          "\nThey rated it a #{checkin_rating} and said \"#{checkin_comment}\""
-      is_binary(checkin_comment)
-        and checkin_comment != "" ->
-          "\nThey said \"#{checkin_comment}\""
-      is_number(checkin_rating) and checkin_rating > 0 ->
-        "\nThey rated it a #{checkin_rating}."
+      is_binary(c.checkin_comment)
+        and c.checkin_comment != ""
+        and is_number(c.checkin_rating) -> 
+          "\nThey rated it a #{c.checkin_rating} and said \"#{c.checkin_comment}\""
+      is_binary(c.checkin_comment)
+        and c.checkin_comment != "" ->
+          "\nThey said \"#{c.checkin_comment}\""
+      is_number(c.checkin_rating) and c.checkin_rating > 0 ->
+        "\nThey rated it a #{c.checkin_rating}."
       true -> ""
     end
 
@@ -410,40 +390,38 @@ defmodule Slacktapped.Checkins do
     end
 
     image_url = cond do
-      is_list(media_items) and Enum.count(media_items) >= 1 ->
-        media_items
+      is_list(c.media_items) and Enum.count(c.media_items) >= 1 ->
+        c.media_items
           |> Enum.at(0)
           |> get_in(["photo", "photo_img_lg"])
-      beer_label != "https://untappd.akamaized.net/site/assets/images/temp/badge-beer-default.png" ->
-        beer_label
+      c.beer_label != "https://untappd.akamaized.net/site/assets/images/temp/badge-beer-default.png" ->
+        c.beer_label
       true -> ""
     end
 
     # If we have an image and there was already a post for this checkin
     # *without* an image, only indicate that an image was added.
-    cmd = "GET #{@instance_name}:#{checkin_id}:without-image"
+    cmd = "GET #{@instance_name}:#{c.checkin_id}:without-image"
     text = if is_binary(image_url) and
         @redis.command(cmd) == {:ok, "1"} do
-      "#{user} added an image to " <>
-      "<https://untappd.com/user/#{user_username}/checkin/#{checkin_id}|" <>
-      "their checkin> of #{beer}."
+      "#{c.user} added an image to <#{c.checkin_url}|their checkin> of #{c.beer}."
     else
-      "#{user} is drinking #{beer} (#{beer_style}, #{beer_abv}% ABV)" <>
-      "#{venue}.#{rating_and_comment}\n#{toast}"
+      "#{c.user} is drinking #{c.beer} (#{c.beer_style}, #{c.beer_abv}% ABV)" <>
+      "#{venue}.#{rating_and_comment}\n<#{c.checkin_url}|Toast »>"
     end
 
     {:ok, %{
-      "author_icon" => user_avatar,
-      "author_link" => "https://untappd.com/user/#{user_username}",
-      "author_name" => user_username,
+      "author_icon" => c.user_avatar,
+      "author_link" => c.user_url,
+      "author_name" => c.user_username,
       "color" => "#FFCF0B",
       "fallback" => "Image of this checkin.",
-      "footer" => "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>",
-      "footer_icon" => brewery_label,
+      "footer" => c.brewery,
+      "footer_icon" => c.brewery_label,
       "image_url" => image_url,
       "text" => text,
-      "title" => beer_name,
-      "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
+      "title" => c.beer_name,
+      "title_link" => c.beer_url
     }}
   end
 

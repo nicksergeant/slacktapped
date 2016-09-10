@@ -108,7 +108,7 @@ defmodule Slacktapped do
     with {:ok, checkin} <- is_eligible_checkin(checkin),
          {_ok, checkin} <- Slacktapped.Checkins.process_checkin(checkin),
          {_ok, checkin} <- Slacktapped.Badges.process_badges(checkin),
-         # {:ok, checkin} <- Slacktapped.Checkins.process_comments(checkin),
+         {_ok, checkin} <- Slacktapped.Comments.process_comments(checkin),
          do: {:ok, checkin}
   end
 
@@ -142,59 +142,6 @@ defmodule Slacktapped do
         {:error, checkin}
       true ->
         {:ok, checkin}
-    end
-  end
-
-  @doc """
-  Adds an attachment to the checkin's attachments list.
-
-  ## Example
-
-      iex> Slacktapped.add_attachments([%{"foo" => "bar"}], %{"attachments" => []})
-      {:ok, %{"attachments" => [%{"foo" => "bar"}]}}
-
-      iex> Slacktapped.add_attachments([%{"foo" => "bar"}, %{"wat" => "ba"}], %{"attachments" => []})
-      {:ok, %{"attachments" => [%{"foo" => "bar"}, %{"wat" => "ba"}]}}
-
-  """
-  def add_attachments(attachments, checkin) do
-    new_attachments = checkin["attachments"] ++ attachments
-    checkin = Map.put(checkin, "attachments", new_attachments)
-    {:ok, checkin}
-  end
-
-  @doc """
-  Returns the user's name. If both first and last name are present, returns
-  "First-name Last-name", otherwise returns "username".
-
-  ## Examples
-
-      iex> Slacktapped.parse_name(%{"user_name" => "nicksergeant"})
-      {:ok, "nicksergeant"}
-
-      iex> Slacktapped.parse_name(%{
-      ...>   "user_name" => "nicksergeant",
-      ...>   "first_name" => "Nick",
-      ...>   "last_name" => "Sergeant"
-      ...> })
-      {:ok, "Nick Sergeant"}
-
-      iex> Slacktapped.parse_name(%{
-      ...>   "user_name" => "nicksergeant",
-      ...>   "first_name" => "Nick"
-      ...> })
-      {:ok, "nicksergeant"}
-
-  """
-  def parse_name(user) do
-    case user do
-      %{
-        "first_name" => first_name,
-        "last_name" => last_name
-      } ->
-        {:ok, "#{first_name} #{last_name}"}
-      _ ->
-        {:ok, "#{user["user_name"]}"}
     end
   end
 end

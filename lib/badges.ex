@@ -20,7 +20,7 @@ defmodule Slacktapped.Badges do
               acc
             end
           end)
-        |> Slacktapped.add_attachments(checkin)
+        |> Slacktapped.Utils.add_attachments(checkin)
     else
       {:ok, checkin}
     end
@@ -41,9 +41,19 @@ defmodule Slacktapped.Badges do
   Badge is ineligible if we have already posted it to Slack.
 
   ## Example
+
+      iex> Slacktapped.Badges.is_eligible_badge(%{"user_badge_id" => 5566})
+      true
+
+      iex> Slacktapped.Badges.is_eligible_badge(%{"user_badge_id" => 5533})
+      false
+
   """
   def is_eligible_badge(badge) do
-    false
+    user_badge_id = badge["user_badge_id"]
+    get_key = "GET #{@instance_name}:badge-#{user_badge_id}"
+
+    @redis.command("#{get_key}") == {:ok, nil}
   end
 
   @doc """
@@ -71,22 +81,15 @@ defmodule Slacktapped.Badges do
   Reports that a badge was posted to Slack by setting a Redis key.
 
   ## Example
+
+      iex> Slacktapped.Badges.report_badge(%{"user_badge_id" => 876})
+      {:ok, %{"user_badge_id" => 876}}
+
   """
   def report_badge(badge) do
-    # checkin_id = checkin["checkin_id"]
-    # media_items = checkin["media"]["items"]
-    # has_image = is_list(media_items) and Enum.count(media_items) >= 1
+    user_badge_id = badge["user_badge_id"]
 
-    # reported_as = cond do
-    #   has_image == true ->
-    #     @redis.command("SET #{@instance_name}:#{checkin_id}:with-image 1")
-    #     "with-image"
-    #   true ->
-    #     @redis.command("SET #{@instance_name}:#{checkin_id}:without-image 1")
-    #     "without-image"
-    # end
-
-    # checkin = Map.put(checkin, "reported_as", reported_as)
+    @redis.command("SET #{@instance_name}:badge-#{user_badge_id} 1")
 
     {:ok, badge}
   end
