@@ -169,7 +169,7 @@ defmodule Slacktapped.Checkins do
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV)." <>
-            "\nThey said \"Lovely!\"\n" <>
+            "\nThey said: ```Lovely!```\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -240,6 +240,33 @@ defmodule Slacktapped.Checkins do
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV).\n" <>
+            "<https://untappd.com/user//checkin/|Toast »>",
+          "title" => nil,
+          "title_link" => "https://untappd.com/b//"
+        }
+      }
+
+  A checkin with a rating of 0 and a comment:
+
+      iex> Slacktapped.Checkins.parse_checkin(%{
+      ...>  "checkin_comment" => "Yuck.",
+      ...>  "rating_score" => 0
+      ...>})
+      {:ok,
+        %{
+          "author_icon" => nil,
+          "author_link" => "https://untappd.com/user/",
+          "author_name" => nil,
+          "color" => "#FFCF0B",
+          "fallback" => "Image of this checkin.",
+          "footer" => "<https://untappd.com/brewery/|>",
+          "footer_icon" => nil,
+          "image_url" => nil,
+          "mrkdwn_in" => ["text"],
+          "text" => "" <>
+            "<https://untappd.com/user/|> is drinking " <>
+            "<https://untappd.com/b//|> (, % ABV)." <>
+            "\nThey said: ```Yuck.```\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
@@ -381,11 +408,12 @@ defmodule Slacktapped.Checkins do
     rating_and_comment = cond do
       is_binary(c.checkin_comment)
         and c.checkin_comment != ""
+        and c.checkin_rating > 0
         and is_number(c.checkin_rating) -> 
           "\nThey rated it a #{c.checkin_rating} and said:```#{c.checkin_comment}```"
       is_binary(c.checkin_comment)
         and c.checkin_comment != "" ->
-          "\nThey said \"#{c.checkin_comment}\""
+          "\nThey said: ```#{c.checkin_comment}```"
       is_number(c.checkin_rating) and c.checkin_rating > 0 ->
         "\nThey rated it a #{c.checkin_rating}."
       true -> ""
