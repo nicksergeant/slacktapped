@@ -56,7 +56,7 @@ defmodule Slacktapped.Comments do
     @redis.command("#{get_key}") == {:ok, nil}
   end
 
-  @doc """
+  @doc ~S"""
   Parses a comment into an attachment for Slack.
 
   ## Example
@@ -94,7 +94,7 @@ defmodule Slacktapped.Comments do
         "mrkdwn_in" => ["text"],
         "text" => "<http://path/to/comment/user|George C.> commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|nicksergeant's " <>
-          "checkin> and said:```Great beer!```"
+          "checkin> and said:\n\n>Great beer!"
       }
 
   """
@@ -106,7 +106,7 @@ defmodule Slacktapped.Comments do
     comment_user_name = Slacktapped.Utils.parse_name(comment["user"])
 
     text = "<#{comment_user_link}|#{comment_user_name}> commented on " <>
-      "<#{c.checkin_url}|#{c.user_name}'s checkin> and said:```#{comment_text}```"
+      "<#{c.checkin_url}|#{c.user_name}'s checkin> and said:\n\n>#{comment_text}"
 
     %{
       "author_icon" => c.user_avatar,
