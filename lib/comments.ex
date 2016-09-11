@@ -130,8 +130,9 @@ defmodule Slacktapped.Comments do
   """
   def report_comment(comment) do
     comment_id = comment["comment_id"]
+    expiration = Application.get_env(:slacktapped, :redis_expiration)
 
-    @redis.command("SET #{@instance_name}:comment-#{comment_id} 1")
+    @redis.command("SETEX #{@instance_name}:comment-#{comment_id} #{expiration} 1")
 
     {:ok, comment}
   end

@@ -134,9 +134,10 @@ defmodule Slacktapped.Badges do
 
   """
   def report_badge(badge) do
+    expiration = Application.get_env(:slacktapped, :redis_expiration)
     user_badge_id = badge["user_badge_id"]
 
-    @redis.command("SET #{@instance_name}:badge-#{user_badge_id} 1")
+    @redis.command("SETEX #{@instance_name}:badge-#{user_badge_id} #{expiration} 1")
 
     {:ok, badge}
   end

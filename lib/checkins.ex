@@ -508,15 +508,16 @@ defmodule Slacktapped.Checkins do
   """
   def report_checkin_type({:ok, checkin}) do
     checkin_id = checkin["checkin_id"]
+    expiration = Application.get_env(:slacktapped, :redis_expiration)
     media_items = checkin["media"]["items"]
     has_image = is_list(media_items) and Enum.count(media_items) >= 1
 
     reported_as = cond do
       has_image == true ->
-        @redis.command("SET #{@instance_name}:#{checkin_id}:with-image 1")
+        @redis.command("SETEX #{@instance_name}:#{checkin_id}:with-image #{expiration} 1")
         "with-image"
       true ->
-        @redis.command("SET #{@instance_name}:#{checkin_id}:without-image 1")
+        @redis.command("SETEX #{@instance_name}:#{checkin_id}:without-image #{expiration} 1")
         "without-image"
     end
 
