@@ -60,20 +60,77 @@ defmodule Slacktapped.Badges do
   Parses a badge into an attachment for Slack.
 
   ## Example
+
+      iex> Slacktapped.Badges.parse_badge(
+      ...> %{
+      ...>   "badge_name" => "Hopped Up (Level 18)",
+      ...>   "user_badge_id" => 3593,
+      ...>   "badge_image" => %{
+      ...>     "sm" => "http://path/to/badge/image"
+      ...>   }
+      ...> },
+      ...> %{
+      ...>   "attachments" => [],
+      ...>   "user" => %{
+      ...>     "user_name" => "nicksergeant",
+      ...>     "user_avatar" => "http://path/to/user/avatar"
+      ...>   },
+      ...>   "beer" => %{
+      ...>     "bid" => 123,
+      ...>     "beer_abv" => 4.5,
+      ...>     "beer_label" => "http://path/to/beer/label",
+      ...>     "beer_name" => "IPA",
+      ...>     "beer_slug" => "two-lake-ipa",
+      ...>     "beer_style" => "American IPA"
+      ...>   },
+      ...>   "brewery" => %{
+      ...>     "brewery_id" => 1,
+      ...>     "brewery_label" => "http://path/to/brewery/label",
+      ...>     "brewery_name" => "Two Lake"
+      ...>   },
+      ...>   "checkin_comment" => "Lovely!",
+      ...>   "checkin_id" => 567,
+      ...>   "rating_score" => 3.5
+      ...> })
+      %{
+        "author_icon" => "http://path/to/user/avatar",
+        "author_link" => "https://untappd.com/user/nicksergeant",
+        "author_name" => "nicksergeant",
+        "color" => "#FFCF0B",
+        "fallback" => "Checkin badge.",
+        "image_url" => "http://path/to/badge/image",
+        "text" => "<https://untappd.com/user/nicksergeant|nicksergeant> " <>
+          "earned the badge " <>
+          "<https://untappd.com/user/nicksergeant/badges/3593|" <>
+          "Hopped Up (Level 18)> for " <>
+          "<https://untappd.com/user/nicksergeant/checkin/567|their checkin> " <>
+          "of <https://untappd.com/b/two-lake-ipa/123|IPA>.",
+        "title" => "Hopped Up (Level 18)",
+        "title_link" => "https://untappd.com/user/nicksergeant/badges/3593"
+      }
+
   """
   def parse_badge(badge, checkin) do
+    c = Slacktapped.Utils.checkin_parts(checkin)
+
+    user_badge_id = badge["user_badge_id"]
+    badge_image = badge["badge_image"]["sm"]
+    badge_name = badge["badge_name"]
+    badge_url = "https://untappd.com/user/#{c.user_username}/badges/#{user_badge_id}"
+
+    text = "#{c.user} earned the badge <#{badge_url}|#{badge_name}> for " <>
+      "<#{c.checkin_url}|their checkin> of #{c.beer}."
+
     %{
-      # "author_icon" => user_avatar,
-      # "author_link" => "https://untappd.com/user/#{user_username}",
-      # "author_name" => user_username,
-      # "color" => "#FFCF0B",
-      # "fallback" => "Image of this checkin.",
-      # "footer" => "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>",
-      # "footer_icon" => brewery_label,
-      # "image_url" => image_url,
-      # "text" => text,
-      # "title" => beer_name,
-      # "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
+      "author_icon" => c.user_avatar,
+      "author_link" => c.user_url,
+      "author_name" => c.user_username,
+      "color" => "#FFCF0B",
+      "fallback" => "Checkin badge.",
+      "image_url" => badge_image,
+      "text" => text,
+      "title" => badge_name,
+      "title_link" => badge_url
     }
   end
 
