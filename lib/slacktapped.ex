@@ -81,6 +81,7 @@ defmodule Slacktapped do
               "footer" => "<https://untappd.com/brewery/|>",
               "footer_icon" => nil,
               "image_url" => nil,
+              "mrkdwn_in" => ["text"],
               "text" => "<https://untappd.com/user/|> is drinking " <>
                 "<https://untappd.com/b//|> (, % ABV).\n" <>
                 "<https://untappd.com/user//checkin/|Toast »>",

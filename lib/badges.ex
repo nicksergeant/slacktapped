@@ -77,20 +77,10 @@ defmodule Slacktapped.Badges do
       ...>   },
       ...>   "beer" => %{
       ...>     "bid" => 123,
-      ...>     "beer_abv" => 4.5,
-      ...>     "beer_label" => "http://path/to/beer/label",
       ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa",
-      ...>     "beer_style" => "American IPA"
+      ...>     "beer_slug" => "two-lake-ipa"
       ...>   },
-      ...>   "brewery" => %{
-      ...>     "brewery_id" => 1,
-      ...>     "brewery_label" => "http://path/to/brewery/label",
-      ...>     "brewery_name" => "Two Lake"
-      ...>   },
-      ...>   "checkin_comment" => "Lovely!",
-      ...>   "checkin_id" => 567,
-      ...>   "rating_score" => 3.5
+      ...>   "checkin_id" => 567
       ...> })
       %{
         "author_icon" => "http://path/to/user/avatar",

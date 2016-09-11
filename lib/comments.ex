@@ -60,20 +60,62 @@ defmodule Slacktapped.Comments do
   Parses a comment into an attachment for Slack.
 
   ## Example
+
+      iex> Slacktapped.Comments.parse_comment(
+      ...> %{
+      ...>   "comment_id" => 3593,
+      ...>   "comment" => "Great beer!",
+      ...>   "user" => %{
+      ...>     "first_name" => "George",
+      ...>     "last_name" => "C.",
+      ...>     "user_link" => "http://path/to/comment/user",
+      ...>     "user_name" => "george"
+      ...>   }
+      ...> },
+      ...> %{
+      ...>   "attachments" => [],
+      ...>   "user" => %{
+      ...>     "user_name" => "nicksergeant",
+      ...>     "user_avatar" => "http://path/to/user/avatar"
+      ...>   },
+      ...>   "beer" => %{
+      ...>     "bid" => 123,
+      ...>     "beer_name" => "IPA",
+      ...>     "beer_slug" => "two-lake-ipa"
+      ...>   },
+      ...>   "checkin_id" => 567
+      ...> })
+      %{
+        "author_icon" => "http://path/to/user/avatar",
+        "author_link" => "https://untappd.com/user/nicksergeant",
+        "author_name" => "nicksergeant",
+        "color" => "#FFCF0B",
+        "fallback" => "Checkin comment.",
+        "mrkdwn_in" => ["text"],
+        "text" => "<http://path/to/comment/user|George C.> commented on " <>
+          "<https://untappd.com/user/nicksergeant/checkin/567|nicksergeant's " <>
+          "checkin> and said:```Great beer!```"
+      }
+
   """
   def parse_comment(comment, checkin) do
+    c = Slacktapped.Utils.checkin_parts(checkin)
+
+    comment_text = comment["comment"]
+    comment_user_link = comment["user"]["user_link"]
+    comment_user_name = Slacktapped.Utils.parse_name(comment["user"])
+
+    text = "<#{comment_user_link}|#{comment_user_name}> commented on " <>
+      "<#{c.checkin_url}|#{c.user_name}'s checkin> and said:```#{comment_text}```"
+
     %{
-      # "author_icon" => user_avatar,
-      # "author_link" => "https://untappd.com/user/#{user_username}",
-      # "author_name" => user_username,
-      # "color" => "#FFCF0B",
-      # "fallback" => "Image of this checkin.",
-      # "footer" => "<https://untappd.com/brewery/#{brewery_id}|#{brewery_name}>",
-      # "footer_icon" => brewery_label,
-      # "image_url" => image_url,
-      # "text" => text,
-      # "title" => beer_name,
-      # "title_link" => "https://untappd.com/b/#{beer_slug}/#{beer_id}"
+      "author_icon" => c.user_avatar,
+      "author_link" => c.user_url,
+      "author_name" => c.user_username,
+      "color" => "#FFCF0B",
+      "mrkdwn_in" => ["text"],
+      "fallback" => "Checkin comment.",
+      "text" => text
     }
   end
 

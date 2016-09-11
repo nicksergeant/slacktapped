@@ -137,11 +137,12 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/1|Two Lake>",
           "footer_icon" => "http://path/to/brewery/label",
           "image_url" => "http://path/to/beer/label",
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
             "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
             "(American IPA, 4.5% ABV)." <>
-            "\nThey rated it a 3.5 and said \"Lovely!\"\n" <>
+            "\nThey rated it a 3.5 and said:```Lovely!```\n" <>
             "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
           "title" => "IPA",
           "title_link" => "https://untappd.com/b/two-lake-ipa/123"
@@ -164,6 +165,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV)." <>
@@ -187,6 +189,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV)." <>
@@ -210,6 +213,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV).\n" <>
@@ -232,6 +236,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV).\n" <>
@@ -265,6 +270,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => "http://path/to/beer/image",
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV).\n" <>
@@ -294,6 +300,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => nil,
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV) " <>
@@ -329,6 +336,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => "http://path/to/beer/image",
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> added an image to " <>
             "<https://untappd.com/user//checkin/5566|their checkin> of " <>
@@ -356,6 +364,7 @@ defmodule Slacktapped.Checkins do
           "footer" => "<https://untappd.com/brewery/|>",
           "footer_icon" => nil,
           "image_url" => "",
+          "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
             "<https://untappd.com/b//|> (, % ABV).\n" <>
@@ -373,7 +382,7 @@ defmodule Slacktapped.Checkins do
       is_binary(c.checkin_comment)
         and c.checkin_comment != ""
         and is_number(c.checkin_rating) -> 
-          "\nThey rated it a #{c.checkin_rating} and said \"#{c.checkin_comment}\""
+          "\nThey rated it a #{c.checkin_rating} and said:```#{c.checkin_comment}```"
       is_binary(c.checkin_comment)
         and c.checkin_comment != "" ->
           "\nThey said \"#{c.checkin_comment}\""
@@ -419,6 +428,7 @@ defmodule Slacktapped.Checkins do
       "footer" => c.brewery,
       "footer_icon" => c.brewery_label,
       "image_url" => image_url,
+      "mrkdwn_in" => ["text"],
       "text" => text,
       "title" => c.beer_name,
       "title_link" => c.beer_url
