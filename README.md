@@ -38,7 +38,7 @@ channel.
 2. Set your environment variables:
 
 ```
-INSTANCE_NAME='desk'     # Unique name for this Slacktapped instance.
+INSTANCE_NAME=''         # Unique name for this Slacktapped instance.
 REDIS_HOST=''            # Hostname for your Redis isntance.
 SLACK_WEBHOOK_URL=''     # Your Slack incoming webhook URL.
 UNTAPPD_ACCESS_TOKEN=''  # Token obtained via auth request above.
