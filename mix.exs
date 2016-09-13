@@ -13,6 +13,7 @@ defmodule Slacktapped.Mixfile do
   def application do
     [
       applications: [
+        :beersearch,
         :cowboy,
         :httpotion,
         :logger,
@@ -26,6 +27,7 @@ defmodule Slacktapped.Mixfile do
 
   defp deps do
     [
+      {:beersearch, "~> 0.0.7"},
       {:cowboy, "~> 1.0.0"},
       {:httpotion, "~> 3.0.0"},
       {:mix_test_watch, "~> 0.2", only: :dev},
