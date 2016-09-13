@@ -11,7 +11,7 @@ defmodule Slacktapped do
 
   def start(_type, _args) do
     cowboy_port = Application.get_env(:slacktapped, :cowboy_port, 8000)
-    redis_host = Application.get_env(:slacktapped, :redis_host, "localhost")
+    redis_host = System.get_env("REDIS_HOST") || "localhost"
     redis_port = Application.get_env(:slacktapped, :redis_port, 6379)
 
     children = [
