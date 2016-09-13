@@ -78,10 +78,10 @@ like this:
 ![http://i.nick.sg/73b251f371db440fb9872f58f044964d.png](http://i.nick.sg/73b251f371db440fb9872f58f044964d.png)
 
 By default, the slash command will respond privately to the user. It will
-respond publicly to the channel by appending `--public` to the command, like so:
+respond publicly to the channel by appending `-public` to the command, like so:
 
 ```
-/untappd dogfish 90 --public
+/untappd dogfish 90 -public
 ```
 
 **Installation:**

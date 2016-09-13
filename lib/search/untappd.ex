@@ -66,7 +66,7 @@ defmodule Slacktapped.Search.Untappd do
 
       iex> Slacktapped.Search.Untappd.handle_search(%{
       ...>   "token" => "abc123",
-      ...>   "text" => "fdsafdsa --public"
+      ...>   "text" => "fdsafdsa -public"
       ...> })
       {:ok,
         %{
@@ -90,8 +90,8 @@ defmodule Slacktapped.Search.Untappd do
       token != @untappd_slash_cmd_token ->
         {:error, %{}}
       token == @untappd_slash_cmd_token ->
-        respond_publicly = Regex.match?(~r/--public/, params["text"])
-        text = String.trim(Regex.replace(~r/--public/, params["text"], ""))
+        respond_publicly = Regex.match?(~r/-public/, params["text"])
+        text = String.trim(Regex.replace(~r/-public/, params["text"], ""))
         respond(@beersearch.search(text), respond_publicly)
     end
   end
