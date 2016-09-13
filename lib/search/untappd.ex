@@ -120,7 +120,7 @@ defmodule Slacktapped.Search.Untappd do
       "attachments" => [
         %{
           "color" => "#FFCF0B",
-          "footer" => "<http://path/to/brewery|#{result.brewery}>",
+          "footer" => "<#{result.brewery_url}|#{result.brewery}>",
           "image_url" => result.image,
           "text" => "#{result.style}, #{result.abv}\nAverage rating: #{result.rating}",
           "title" => result.name,
