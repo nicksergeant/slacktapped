@@ -35,6 +35,7 @@ defmodule Slacktapped.Search.Untappd do
             }
           ],
           "icon_url" => "https://slacktapped.s3.amazonaws.com/icon.jpg",
+          "response_type" => "ephemeral",
           "username" => "Untappd"
         }
       }
@@ -56,6 +57,27 @@ defmodule Slacktapped.Search.Untappd do
             }
           ],
           "icon_url" => "https://slacktapped.s3.amazonaws.com/icon.jpg",
+          "response_type" => "ephemeral",
+          "username" => "Untappd"
+        }
+      }
+
+  Respond to channel publicly:
+
+      iex> Slacktapped.Search.Untappd.handle_search(%{
+      ...>   "token" => "abc123",
+      ...>   "text" => "fdsafdsa --public"
+      ...> })
+      {:ok,
+        %{
+          "attachments" => [
+            %{
+              "color" => "#FFCF0B",
+              "text" => "No results."
+            }
+          ],
+          "icon_url" => "https://slacktapped.s3.amazonaws.com/icon.jpg",
+          "response_type" => "in_channel",
           "username" => "Untappd"
         }
       }
@@ -68,14 +90,17 @@ defmodule Slacktapped.Search.Untappd do
       token != @untappd_slash_cmd_token ->
         {:error, %{}}
       token == @untappd_slash_cmd_token ->
-        respond(@beersearch.search(params["text"]))
+        respond_publicly = Regex.match?(~r/--public/, params["text"])
+        text = String.trim(Regex.replace(~r/--public/, params["text"], ""))
+        respond(@beersearch.search(text), respond_publicly)
     end
   end
 
-  defp respond([]) do
+  defp respond([], respond_publicly) do
     {:ok, %{
       "icon_url" => "https://slacktapped.s3.amazonaws.com/icon.jpg",
       "username" => "Untappd",
+      "response_type" => if respond_publicly do "in_channel" else "ephemeral" end,
       "attachments" => [
         %{
           "color" => "#FFCF0B",
@@ -85,12 +110,13 @@ defmodule Slacktapped.Search.Untappd do
     }}
   end
 
-  defp respond(results) do
+  defp respond(results, respond_publicly) do
     result = Enum.at(results, 0)
 
     {:ok, %{
       "icon_url" => "https://slacktapped.s3.amazonaws.com/icon.jpg",
       "username" => "Untappd",
+      "response_type" => if respond_publicly do "in_channel" else "ephemeral" end,
       "attachments" => [
         %{
           "color" => "#FFCF0B",
