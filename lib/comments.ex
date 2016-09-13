@@ -94,7 +94,8 @@ defmodule Slacktapped.Comments do
         "mrkdwn_in" => ["text"],
         "text" => "<http://path/to/comment/user|George C.> commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|nicksergeant's " <>
-          "checkin> and said:\n>Great beer!"
+          "checkin> of <https://untappd.com/b/two-lake-ipa/123|IPA> and " <>
+          "said:\n>Great beer!"
       }
 
   """
@@ -106,7 +107,8 @@ defmodule Slacktapped.Comments do
     comment_user_name = Slacktapped.Utils.parse_name(comment["user"])
 
     text = "<#{comment_user_link}|#{comment_user_name}> commented on " <>
-      "<#{c.checkin_url}|#{c.user_name}'s checkin> and said:\n>#{comment_text}"
+      "<#{c.checkin_url}|#{c.user_name}'s checkin> of " <>
+      "#{c.beer} and said:\n>#{comment_text}"
 
     %{
       "author_icon" => c.user_avatar,
