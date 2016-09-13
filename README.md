@@ -4,6 +4,9 @@ Slacktapped is an <a href="http://elixir-lang.org/">Elixir</a> app to post
 <a href="https://untappd.com/">Untappd</a> activity to
 <a href="https://slack.com/">Slack</a>.
 
+It can also, <a href="#slash-commands">with additional configuration</a>,
+respond to Slack slash commands and allow users to search for beers on Untappd.
+
 Once installed, this bot will post checkins, badges, and comments to a Slack
 channel.
 
@@ -58,6 +61,39 @@ Untappd every 60 seconds for new activity:
 With any luck, you'll see Untappd activity in your Slack channel:
 
 ![http://i.nick.sg/45afb435b99b478eb4dade42567072af.png](http://i.nick.sg/45afb435b99b478eb4dade42567072af.png)
+
+## Slash Commands
+
+In addition to polling the Untappd API for activity, this bot also boots a web
+server that can act as a
+<a href="https://api.slack.com/slash-commands">Slack Slash Command</a> endpoint.
+
+Once installed, users can use the slash command to search for beers on Untappd,
+like this:
+
+```
+/untappd dogfish 90
+```
+
+![http://i.nick.sg/73b251f371db440fb9872f58f044964d.png](http://i.nick.sg/73b251f371db440fb9872f58f044964d.png)
+
+By default, the slash command will respond privately to the user. It will
+respond publicly to the channel by appending `--public` to the command, like so:
+
+```
+/untappd dogfish 90 --public
+```
+
+*Installation:*
+
+1. Create a <a href="https://api.slack.com/slash-commands">slash command</a> for
+   your Slack team.
+2. Ensure that your bot is running under an HTTPS endpoint (Slack requires this).
+3. Set the environment variable for the slash command token:
+
+```
+UNTAPPD_SLASH_CMD_TOKEN=''
+```
 
 ## Support
 
