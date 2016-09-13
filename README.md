@@ -57,7 +57,7 @@ Untappd every 60 seconds for new activity:
 
 With any luck, you'll see Untappd activity in your Slack channel:
 
-![http://i.nick.sg/8778d379325a4cb3bc46f7ca33dab04f.png](http://i.nick.sg/8778d379325a4cb3bc46f7ca33dab04f.png)
+![http://i.nick.sg/acbf048ec9c940fa9db355428c7e23e2.png](http://i.nick.sg/acbf048ec9c940fa9db355428c7e23e2.png)
 
 ## Support
 
