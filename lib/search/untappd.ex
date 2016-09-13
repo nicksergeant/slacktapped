@@ -27,7 +27,7 @@ defmodule Slacktapped.Search.Untappd do
           "attachments" => [
             %{
               "color" => "#FFCF0B",
-              "footer" => "Dogfish Head Craft Brewery",
+              "footer" => "<http://path/to/brewery|Dogfish Head Craft Brewery>",
               "image_url" => "https://untappd.akamaized.net/site/beer_logos/beer-3952_a5c9d_sm.jpeg",
               "text" => "IPA - American, 6% ABV\nAverage rating: 3.898",
               "title" => "60 Minute IPA",
@@ -120,7 +120,7 @@ defmodule Slacktapped.Search.Untappd do
       "attachments" => [
         %{
           "color" => "#FFCF0B",
-          "footer" => result.brewery,
+          "footer" => "<http://path/to/brewery|#{result.brewery}>",
           "image_url" => result.image,
           "text" => "#{result.style}, #{result.abv}\nAverage rating: #{result.rating}",
           "title" => result.name,
