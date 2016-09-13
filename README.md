@@ -1,29 +1,36 @@
 # Slacktapped
 
-Slacktapped is an Elixir app to post Untappd activity to Slack.
+Slacktapped is an <a href="http://elixir-lang.org/">Elixir</a> app to post
+<a href="https://untappd.com/">Untappd</a> activity to
+<a href="https://slack.com/">Slack</a>.
 
-Once installed, this bot will post checkins, badges, and comments of
-friends of the authenticated user to a Slack channel.
+Once installed, this bot will post checkins, badges, and comments to a Slack
+channel.
 
 ## Setup
 
 1. Apply for an <a href="https://untappd.com/api/">Untappd API application</a>.
-   Sadly this seems to take a few days.
+   Make sure you set a Callback URL for the application (any valid URL).
 2. Create an <a href="https://api.slack.com/incoming-webhooks">incoming webhook</a>
    and point it to the channel of your choosing in your Slack team.
-3. Create a new <a href="https://untappd.com/">Untappd</a> user. This user
-   will be a standalone user that the bot will authenticate as.
-4. For any user whose activity you want this bot to post, have that user "friend"
-   the created Untappd user, and then accept the friendship on Untappd.
-5. <a href="https://redislabs.com/redis-cloud">Obtain</a> or deploy a Redis instance.
-   Redis is used to keep track of activity that has been posted to Slack.
+3. Create a new Untappd user. This user will be a standalone user that the bot
+   will authenticate as.
+4. For any people whose Untappd activity you want this bot to post, have that
+   person "friend" the Untappd user created in step 3, and then accept the
+   friendship on Untappd.
+5. <a href="https://redislabs.com/redis-cloud">Obtain</a> or deploy a Redis
+   instance. Redis is used to keep track of activity that has been posted to
+   Slack.
 6. With your Untappd API credentials, authenticate as your user using the
    <a href="https://untappd.com/api/docs#authentication">"Client Side Authentication" instructions here</a>.
-   Make note of the returned `access_token`. Currently Untappd does not expire
-   access tokens retrieved in this manner, but we may implement proper OAuth
-   support for Slacktapped in the future.
-7. Deploy this bot to Heroku or <a href="http://dokku.viewdocs.io/dokku/">Dokku</a>,
-   by following the instructions below.
+   Use the provided Callback URL you specified in step 1. Make note of the
+   returned `access_token` in the URL. Currently Untappd does not expire access
+   tokens retrieved in this manner, but we may implement proper OAuth support
+   for Slacktapped in the future.
+7. Clone this repo and deploy to <a href="https://www.heroku.com/">Heroku</a>
+   or <a href="http://dokku.viewdocs.io/dokku/">Dokku</a>, by following the
+   instructions below. You should also be able to deploy to any system that
+   supports building applications via <a href="https://devcenter.heroku.com/articles/buildpacks">buildpacks</a>.
 
 ## Deployment
 
@@ -47,6 +54,10 @@ Untappd every 60 seconds for new activity:
 [Processor] Running...
 [Processor] Done.
 ```
+
+With any luck, you'll see Untappd activity in your Slack channel:
+
+![http://i.nick.sg/8778d379325a4cb3bc46f7ca33dab04f.png](http://i.nick.sg/8778d379325a4cb3bc46f7ca33dab04f.png)
 
 ## Support
 
