@@ -84,7 +84,7 @@ respond publicly to the channel by appending `--public` to the command, like so:
 /untappd dogfish 90 --public
 ```
 
-*Installation:*
+**Installation:**
 
 1. Create a <a href="https://api.slack.com/slash-commands">slash command</a> for
    your Slack team.
