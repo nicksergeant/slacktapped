@@ -89,7 +89,8 @@ respond publicly to the channel by appending `--public` to the command, like so:
 1. Create a <a href="https://api.slack.com/slash-commands">slash command</a> for
    your Slack team.
 2. Ensure that your bot is running under an HTTPS endpoint (Slack requires this).
-3. Set the environment variable for the slash command token:
+3. Set the URL for the slash command to `https://<hostname-to-bot>/search`.
+4. Set the environment variable for the slash command token:
 
 ```
 UNTAPPD_SLASH_CMD_TOKEN=''
