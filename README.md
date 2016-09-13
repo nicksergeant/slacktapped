@@ -7,20 +7,21 @@ friends of the authenticated user to a Slack channel.
 
 ## Setup
 
-1. Create an incoming webhook and point it to the channel of your choosing in
-   your Slack team.
-2. Create a new Untappd user. This user will be a standalone user that the bot
-   will authenticate as.
-3. For any user whose activity you want this bot to post, have that user friend
+1. Apply for an <a href="https://untappd.com/api/">Untappd API application</a>.
+   Sadly this seems to take a few days.
+2. Create an <a href="https://api.slack.com/incoming-webhooks">incoming webhook</a>
+   and point it to the channel of your choosing in your Slack team.
+3. Create a new <a href="https://untappd.com/">Untappd</a> user. This user
+   will be a standalone user that the bot will authenticate as.
+4. For any user whose activity you want this bot to post, have that user "friend"
    the created Untappd user, and then accept the friendship on Untappd.
-4. Create an <a href="https://untappd.com/api/">Untappd API application</a>.
 5. <a href="https://redislabs.com/redis-cloud">Obtain</a> or deploy a Redis instance.
    Redis is used to keep track of activity that has been posted to Slack.
 6. With your Untappd API credentials, authenticate as your user using the
    <a href="https://untappd.com/api/docs#authentication">"Client Side Authentication" instructions here</a>.
    Make note of the returned `access_token`. Currently Untappd does not expire
-   access tokens retrieved in this manner, but we hope to implement proper
-   OAuth in the future.
+   access tokens retrieved in this manner, but we may implement proper OAuth
+   support for Slacktapped in the future.
 7. Deploy this bot to Heroku or <a href="http://dokku.viewdocs.io/dokku/">Dokku</a>,
    by following the instructions below.
 
@@ -49,5 +50,5 @@ Untappd every 60 seconds for new activity:
 
 ## Support
 
-If you need help deploying or would like to help with features,
+If you need help deploying or have an idea for a feature,
 <a href="https://github.com/nicksergeant/slacktapped/issues/new">create an issue</a>.
