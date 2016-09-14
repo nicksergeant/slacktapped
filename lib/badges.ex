@@ -87,7 +87,7 @@ defmodule Slacktapped.Badges do
         "author_link" => "https://untappd.com/user/nicksergeant",
         "author_name" => "nicksergeant",
         "color" => "#FFCF0B",
-        "fallback" => "Checkin badge.",
+        "fallback" => "nicksergeant earned the badge Hopped Up (Level 18).",
         "image_url" => "http://path/to/badge/image",
         "text" => "<https://untappd.com/user/nicksergeant|nicksergeant> " <>
           "earned the badge " <>
@@ -116,7 +116,7 @@ defmodule Slacktapped.Badges do
       "author_link" => c.user_url,
       "author_name" => c.user_username,
       "color" => "#FFCF0B",
-      "fallback" => "Checkin badge.",
+      "fallback" => "#{c.user_name} earned the badge #{badge_name}.",
       "image_url" => badge_image,
       "text" => text,
       "title" => badge_name,

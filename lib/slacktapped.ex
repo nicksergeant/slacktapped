@@ -77,7 +77,7 @@ defmodule Slacktapped do
               "author_link" => "https://untappd.com/user/",
               "author_name" => nil,
               "color" => "#FFCF0B",
-              "fallback" => "Image of this checkin.",
+              "fallback" => " is drinking .",
               "footer" => "<https://untappd.com/brewery/|>",
               "footer_icon" => nil,
               "image_url" => nil,

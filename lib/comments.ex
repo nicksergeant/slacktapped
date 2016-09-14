@@ -87,7 +87,7 @@ defmodule Slacktapped.Comments do
       ...> })
       %{
         "color" => "#FFCF0B",
-        "fallback" => "Checkin comment.",
+        "fallback" => "George C. commented on nicksergeant's checkin.",
         "mrkdwn_in" => ["text"],
         "text" => "<http://path/to/comment/user|George C.> commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|nicksergeant's " <>
@@ -110,7 +110,7 @@ defmodule Slacktapped.Comments do
     %{
       "color" => "#FFCF0B",
       "mrkdwn_in" => ["text"],
-      "fallback" => "Checkin comment.",
+      "fallback" => "#{comment_user_name} commented on #{c.user_name}'s checkin.",
       "text" => text
     }
   end
