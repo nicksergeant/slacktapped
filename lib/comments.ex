@@ -86,9 +86,6 @@ defmodule Slacktapped.Comments do
       ...>   "checkin_id" => 567
       ...> })
       %{
-        "author_icon" => "http://path/to/user/avatar",
-        "author_link" => "https://untappd.com/user/nicksergeant",
-        "author_name" => "nicksergeant",
         "color" => "#FFCF0B",
         "fallback" => "Checkin comment.",
         "mrkdwn_in" => ["text"],
@@ -111,9 +108,6 @@ defmodule Slacktapped.Comments do
       "#{c.beer} and said:\n>#{comment_text}"
 
     %{
-      "author_icon" => c.user_avatar,
-      "author_link" => c.user_url,
-      "author_name" => c.user_username,
       "color" => "#FFCF0B",
       "mrkdwn_in" => ["text"],
       "fallback" => "Checkin comment.",
