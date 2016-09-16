@@ -7,7 +7,7 @@ Slacktapped is an <a href="http://elixir-lang.org/">Elixir</a> app to post
 Once installed, this bot will post checkins, badges, and comments to a Slack
 channel.
 
-It can also, <a href="#slash-commands">with additional configuration</a>,
+It can also (<a href="#slash-commands">with additional configuration</a>)
 respond to Slack slash commands and allow users to search for beers on Untappd.
 
 ## Setup
