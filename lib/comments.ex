@@ -59,7 +59,7 @@ defmodule Slacktapped.Comments do
   @doc ~S"""
   Parses a comment into an attachment for Slack.
 
-  ## Example
+  ## Examples
 
       iex> Slacktapped.Comments.parse_comment(
       ...> %{
@@ -68,6 +68,7 @@ defmodule Slacktapped.Comments do
       ...>   "user" => %{
       ...>     "first_name" => "George",
       ...>     "last_name" => "C.",
+      ...>     "uid" => 358,
       ...>     "user_link" => "http://path/to/comment/user",
       ...>     "user_name" => "george"
       ...>   }
@@ -75,8 +76,8 @@ defmodule Slacktapped.Comments do
       ...> %{
       ...>   "attachments" => [],
       ...>   "user" => %{
-      ...>     "user_name" => "nicksergeant",
-      ...>     "user_avatar" => "http://path/to/user/avatar"
+      ...>     "uid" => 357,
+      ...>     "user_name" => "nicksergeant"
       ...>   },
       ...>   "beer" => %{
       ...>     "bid" => 123,
@@ -95,17 +96,60 @@ defmodule Slacktapped.Comments do
           "said:\n>Great beer!"
       }
 
+  If the checkin's owner posts a comment on their own checkin:
+
+      iex> Slacktapped.Comments.parse_comment(
+      ...> %{
+      ...>   "comment_id" => 3593,
+      ...>   "comment" => "I loved this!",
+      ...>   "user" => %{
+      ...>     "uid" => 357,
+      ...>     "user_name" => "nicksergeant"
+      ...>   }
+      ...> },
+      ...> %{
+      ...>   "attachments" => [],
+      ...>   "user" => %{
+      ...>     "uid" => 357,
+      ...>     "user_name" => "nicksergeant"
+      ...>   },
+      ...>   "beer" => %{
+      ...>     "bid" => 123,
+      ...>     "beer_name" => "IPA",
+      ...>     "beer_slug" => "two-lake-ipa"
+      ...>   },
+      ...>   "checkin_id" => 567
+      ...> })
+      %{
+        "color" => "#FFCF0B",
+        "fallback" => "nicksergeant commented on nicksergeant's checkin.",
+        "mrkdwn_in" => ["text"],
+        "text" => "<|nicksergeant> commented on " <>
+          "<https://untappd.com/user/nicksergeant/checkin/567|their " <>
+          "checkin> of <https://untappd.com/b/two-lake-ipa/123|IPA> and " <>
+          "said:\n>I loved this!"
+      }
+
   """
   def parse_comment(comment, checkin) do
     c = Slacktapped.Utils.checkin_parts(checkin)
 
+    checkin_user_id = checkin["user"]["uid"]
     comment_text = comment["comment"]
+    comment_user_id = comment["user"]["uid"]
     comment_user_link = comment["user"]["user_link"]
     comment_user_name = Slacktapped.Utils.parse_name(comment["user"])
 
-    text = "<#{comment_user_link}|#{comment_user_name}> commented on " <>
-      "<#{c.checkin_url}|#{c.user_name}'s checkin> of " <>
-      "#{c.beer} and said:\n>#{comment_text}"
+    text = cond do
+      checkin_user_id == comment_user_id ->
+        "<#{comment_user_link}|#{comment_user_name}> commented on " <>
+        "<#{c.checkin_url}|their checkin> of " <>
+        "#{c.beer} and said:\n>#{comment_text}"
+      true ->
+        "<#{comment_user_link}|#{comment_user_name}> commented on " <>
+        "<#{c.checkin_url}|#{c.user_name}'s checkin> of " <>
+        "#{c.beer} and said:\n>#{comment_text}"
+    end
 
     %{
       "color" => "#FFCF0B",
