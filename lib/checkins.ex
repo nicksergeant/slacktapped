@@ -364,10 +364,7 @@ defmodule Slacktapped.Checkins do
           "footer_icon" => nil,
           "image_url" => "http://path/to/beer/image",
           "mrkdwn_in" => ["text"],
-          "text" => "" <>
-            "<https://untappd.com/user/|> added an image to " <>
-            "<https://untappd.com/user//checkin/5566|their checkin> of " <>
-            "<https://untappd.com/b//|>.",
+          "text" => "",
           "title" => nil,
           "title_link" => "https://untappd.com/b//"
         }
@@ -440,8 +437,7 @@ defmodule Slacktapped.Checkins do
     # *without* an image, only indicate that an image was added.
     cmd = "GET #{@instance_name}:#{c.checkin_id}:without-image"
     text = if is_binary(image_url) and
-        @redis.command(cmd) == {:ok, "1"} do
-      "#{c.user} added an image to <#{c.checkin_url}|their checkin> of #{c.beer}."
+        @redis.command(cmd) == {:ok, "1"} do ""
     else
       "#{c.user} is drinking #{c.beer} (#{c.beer_style}, #{c.beer_abv}% ABV)" <>
       "#{venue}.#{rating_and_comment}\n<#{c.checkin_url}|Toast »>"
