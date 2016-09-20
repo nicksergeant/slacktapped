@@ -10,6 +10,8 @@ respond to Slack slash commands and allow users to search for beers on Untappd.
 
 The source code is available on GitHub at [https://github.com/nicksergeant/slacktapped](https://github.com/nicksergeant/slacktapped).
 
+Online documentation is available at [slacktapped.com](http://slacktapped.com).
+
 ## Setup
 
 1. Apply for an <a href="https://untappd.com/api/">Untappd API application</a>.
