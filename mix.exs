@@ -2,12 +2,20 @@ defmodule Slacktapped.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :slacktapped,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :slacktapped,
+      build_embedded: Mix.env == :prod,
+      deps: deps(),
+      docs: [extras: [
+        "README.md": [path: "readme", title: "Readme"]
+      ]],
+      elixir: "~> 1.3",
+      homepage_url: "http://slacktapped.com",
+      name: "Slacktapped",
+      source_url: "https://github.com/nicksergeant/slacktapped",
+      start_permanent: Mix.env == :prod,
+      version: "1.0.0",
+   ]
   end
 
   def application do
@@ -29,6 +37,7 @@ defmodule Slacktapped.Mixfile do
     [
       {:beersearch, "~> 0.0.8"},
       {:cowboy, "~> 1.0.0"},
+      {:ex_doc, "~> 0.12", only: :dev},
       {:httpotion, "~> 3.0.0"},
       {:mix_test_watch, "~> 0.2", only: :dev},
       {:plug, "~> 1.0"},

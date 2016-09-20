@@ -1,14 +1,14 @@
 # Slacktapped [![CircleCI](https://circleci.com/gh/nicksergeant/slacktapped.svg?style=svg)](https://circleci.com/gh/nicksergeant/slacktapped)
 
-Slacktapped is an <a href="http://elixir-lang.org/">Elixir</a> app to post
-<a href="https://untappd.com/">Untappd</a> activity to
-<a href="https://slack.com/">Slack</a>.
+Slacktapped is an <a href="http://elixir-lang.org/">Elixir</a> app to post <a href="https://untappd.com/">Untappd</a> activity to <a href="https://slack.com/">Slack</a>.
 
 Once installed, this bot will post checkins, badges, and comments to a Slack
 channel.
 
 It can also (<a href="#slash-commands">with additional configuration</a>)
 respond to Slack slash commands and allow users to search for beers on Untappd.
+
+The source code is available on GitHub at [https://github.com/nicksergeant/slacktapped](https://github.com/nicksergeant/slacktapped).
 
 ## Setup
 
@@ -65,8 +65,7 @@ With any luck, you'll see Untappd activity in your Slack channel:
 ## Slash Commands
 
 In addition to polling the Untappd API for activity, this bot also boots a web
-server that can act as a
-<a href="https://api.slack.com/slash-commands">Slack Slash Command</a> endpoint.
+server that can act as a <a href="https://api.slack.com/slash-commands">Slack Slash Command</a> endpoint.
 
 Once installed, users can use the slash command to search for beers on Untappd,
 like this:
@@ -96,7 +95,16 @@ respond publicly to the channel by appending `-public` to the command, like so:
 UNTAPPD_SLASH_CMD_TOKEN=''
 ```
 
+## Options
+
+Badges can get a bit noisy when you're only interested in seeing checkins and
+comments, so you can disable badge posts by setting the following environment
+variable:
+
+```
+IGNORE_BADGES='true'
+```
+
 ## Support
 
-If you need help deploying or have an idea for a feature,
-<a href="https://github.com/nicksergeant/slacktapped/issues/new">create an issue</a>.
+If you need help deploying or have an idea for a feature, <a href="https://github.com/nicksergeant/slacktapped/issues/new">create an issue</a>.

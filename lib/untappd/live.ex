@@ -1,6 +1,15 @@
 defmodule Slacktapped.Untappd.Live do
   require Logger
 
+  @doc """
+  Makes a request to the Untappd API for the given path.
+
+  ## Example
+
+      iex> Slacktapped.Untappd.Live.get("checkin/recent")
+      %{body: "...", headers: %{ ... }}
+
+  """
   def get(path) do
     HTTPotion.get(api_url(path))
   end

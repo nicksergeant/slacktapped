@@ -6,23 +6,41 @@ defmodule Slacktapped.Badges do
   @doc """
   Processes a checkins badges.
 
-  Loops through all badges and determines if they are eligible to be
+  Does nothing if the instance is configured to ignore badges, otherwise
+  it loops through all badges and determines if they are eligible to be
   posted to Slack. If they are, they're processed and added to the
   checkins attachments.
+
+  ## Examples
+
+      iex> Application.put_env(:slacktapped, :ignore_badges, true)
+      iex> Slacktapped.Badges.process_badges(%{})
+      {:error, %{}}
+
+      iex> Application.put_env(:slacktapped, :ignore_badges, nil)
+      iex> Slacktapped.Badges.process_badges(%{})
+      {:ok, %{}}
+
   """
   def process_badges(checkin) do
-    if is_map(checkin["badges"]) do
-      get_in(checkin, ["badges", "items"])
-        |> Enum.reduce([], fn(badge, acc) ->
-            if is_eligible_badge(badge) do
-              acc ++ [process_badge(badge, checkin)]
-            else
-              acc
-            end
-          end)
-        |> Slacktapped.Utils.add_attachments(checkin)
-    else
-      {:ok, checkin}
+    ignore_badges = System.get_env("IGNORE_BADGES") ||
+      Application.get_env(:slacktapped, :ignore_badges)
+
+    cond do
+      ignore_badges != nil ->
+        {:error, checkin}
+      is_map(checkin["badges"]) == true ->
+        get_in(checkin, ["badges", "items"])
+          |> Enum.reduce([], fn(badge, acc) ->
+              if is_eligible_badge(badge) do
+                acc ++ [process_badge(badge, checkin)]
+              else
+                acc
+              end
+            end)
+          |> Slacktapped.Utils.add_attachments(checkin)
+      true ->
+        {:ok, checkin}
     end
   end
 

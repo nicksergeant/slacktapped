@@ -1,4 +1,14 @@
 defmodule Slacktapped.Slack.Live do
+  @doc """
+  Makes a request to the configured Slack webhook URL with the provided
+  attachments.
+
+  ## Example
+
+      iex> Slacktapped.Slack.Live.post([%{}, %{}])
+      :ok
+
+  """
   def post(attachments) do
     webhook_url = System.get_env("SLACK_WEBHOOK_URL")
 

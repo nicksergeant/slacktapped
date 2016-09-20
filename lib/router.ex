@@ -1,4 +1,10 @@
 defmodule Slacktapped.Router do
+  @moduledoc """
+  Sets up two routes:
+
+  - `/` returns a 200 with a fancy message. Mostly used to verify bot health.
+  - `/search` responds to Slack slash commands.
+  """
   use Plug.Router
 
   plug Plug.Parsers, parsers: [:urlencoded]

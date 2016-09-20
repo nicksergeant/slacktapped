@@ -463,8 +463,8 @@ defmodule Slacktapped.Checkins do
   Reports that a checkin was posted to Slack by setting a Redis key. There are
   two possible Redis keys indicating a post was made:
 
-  1. <slacktapped-instance-name>:<checkin_id>:with-image
-  2. <slacktapped-instance-name>:<checkin_id>:without-image
+  1. [slacktapped-instance-name]:[checkin_id]:with-image
+  2. [slacktapped-instance-name]:[checkin_id]:without-image
 
   Already-posted checkins that were previously posted without an image are
   posted again indicating that the user added an image to the checkin. If a
