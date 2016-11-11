@@ -9,20 +9,37 @@ defmodule Slacktapped.Comments do
   Loops through all comments and determines if they are eligible to be
   posted to Slack. If they are, they're processed and added to the
   checkins attachments.
+
+  ## Examples
+
+      iex> Application.put_env(:slacktapped, :ignore_comments, true)
+      iex> Slacktapped.Comments.process_comments(%{})
+      {:error, %{}}
+
+      iex> Application.put_env(:slacktapped, :ignore_comments, nil)
+      iex> Slacktapped.Comments.process_comments(%{})
+      {:ok, %{}}
+
   """
   def process_comments(checkin) do
-    if is_map(checkin["comments"]) do
-      get_in(checkin, ["comments", "items"])
-        |> Enum.reduce([], fn(comment, acc) ->
-            if is_eligible_comment(comment) do
-              acc ++ [process_comment(comment, checkin)]
-            else
-              acc
-            end
-          end)
-        |> Slacktapped.Utils.add_attachments(checkin)
-    else
-      {:ok, checkin}
+    ignore_comments = System.get_env("IGNORE_COMMENTS") ||
+      Application.get_env(:slacktapped, :ignore_comments)
+
+    cond do
+      ignore_comments != nil ->
+        {:error, checkin}
+      is_map(checkin["comments"]) == true ->
+        get_in(checkin, ["comments", "items"])
+          |> Enum.reduce([], fn(comment, acc) ->
+              if is_eligible_comment(comment) do
+                acc ++ [process_comment(comment, checkin)]
+              else
+                acc
+              end
+            end)
+          |> Slacktapped.Utils.add_attachments(checkin)
+      true ->
+        {:ok, checkin}
     end
   end
 

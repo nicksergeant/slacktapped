@@ -107,6 +107,12 @@ variable:
 IGNORE_BADGES='true'
 ```
 
+To disable comments:
+
+```
+IGNORE_COMMENTS='true'
+```
+
 ## Support
 
 If you need help deploying or have an idea for a feature, <a href="https://github.com/nicksergeant/slacktapped/issues/new">create an issue</a>.
