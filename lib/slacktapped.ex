@@ -10,11 +10,12 @@ defmodule Slacktapped do
   @untappd Application.get_env(:slacktapped, :untappd)
 
   def start(_type, _args) do
-    if is_binary(System.get_env("PORT")) do
-      cowboy_port = String.to_integer(System.get_env("PORT"))
-    else
-      cowboy_port = 5000
-    end
+    cowboy_port = cond do
+      is_binary(System.get_env("PORT")) == true ->
+        String.to_integer(System.get_env("PORT"))
+      true ->
+        5000
+      end
     redis_url = System.get_env("REDIS_URL") || "redis://localhost:6379"
 
     children = [
