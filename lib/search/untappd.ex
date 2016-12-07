@@ -88,11 +88,8 @@ defmodule Slacktapped.Search.Untappd do
 
     cond do
       token != @untappd_slash_cmd_token ->
-        IO.puts "Error in token"
-        IO.puts @untappd_slash_cmd_token
         {:error, %{}}
       token == @untappd_slash_cmd_token ->
-        IO.puts "Success in token"
         respond_publicly = Regex.match?(~r/-public/, params["text"])
         text = String.trim(Regex.replace(~r/-public/, params["text"], ""))
         respond(@beersearch.search(text), respond_publicly)
