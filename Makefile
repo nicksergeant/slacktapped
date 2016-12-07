@@ -1,5 +1,5 @@
 deploy:
-	git push dokku
+	git push heroku
 
 docs:
 	mix docs --main="readme"
