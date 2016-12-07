@@ -11,16 +11,12 @@ defmodule Slacktapped do
 
   def start(_type, _args) do
     cowboy_port = Application.get_env(:slacktapped, :cowboy_port, 8000)
-    redis_host = System.get_env("REDIS_HOST") || "localhost"
-    redis_port = Application.get_env(:slacktapped, :redis_port, 6379)
+    redis_url = System.get_env("REDIS_URL") || "redis://localhost:6379"
 
     children = [
       Plug.Adapters.Cowboy.child_spec(:http, Slacktapped.Router, [], port: cowboy_port),
       worker(Redix, [
-        [
-          host: redis_host,
-          port: redis_port
-        ],
+        redis_url,
         [name: :redix]
       ])
     ]
