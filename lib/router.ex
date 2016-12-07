@@ -20,7 +20,9 @@ defmodule Slacktapped.Router do
         conn
           |> put_resp_content_type("application/json")
           |> send_resp(200, Poison.encode!(response))
+        IO.puts "Success in search post"
       {:error, _} ->
+        IO.puts "Error in search post"
         conn |> send_resp(404, "")
     end
   end
