@@ -1,4 +1,6 @@
 defmodule Slacktapped.Search.Untappd do
+  require Logger
+
   @beersearch Application.get_env(:slacktapped, :beersearch)
   @untappd_slash_cmd_token System.get_env("UNTAPPD_SLASH_CMD_TOKEN") ||
     Application.get_env(:slacktapped, :untappd_slash_cmd_token)
@@ -85,11 +87,14 @@ defmodule Slacktapped.Search.Untappd do
   """
   def handle_search(params) do
     token = params["token"]
+    Logger.info("[Search] Incoming search request with token #{token}...")
 
     cond do
       token != @untappd_slash_cmd_token ->
+        Logger.info("[Search] Responding with error, tokens do not match.")
         {:error, %{}}
       token == @untappd_slash_cmd_token ->
+        Logger.info("[Search] Responding with search result.")
         respond_publicly = Regex.match?(~r/-public/, params["text"])
         text = String.trim(Regex.replace(~r/-public/, params["text"], ""))
         respond(@beersearch.search(text), respond_publicly)
