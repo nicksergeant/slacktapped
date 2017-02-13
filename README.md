@@ -44,7 +44,7 @@ Online documentation is available at [slacktapped.com](http://slacktapped.com).
 
 ```
 INSTANCE_NAME=''         # Unique name for this Slacktapped instance.
-REDIS_HOST=''            # Hostname for your Redis isntance.
+REDIS_URI=''             # URI for your Redis isntance.
 SLACK_WEBHOOK_URL=''     # Your Slack incoming webhook URL.
 UNTAPPD_ACCESS_TOKEN=''  # Token obtained via auth request above.
 UNTAPPD_CLIENT_ID=''     # Your Untappd client ID.
