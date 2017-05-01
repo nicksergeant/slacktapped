@@ -86,7 +86,6 @@ defmodule Slacktapped.Comments do
       ...>     "first_name" => "George",
       ...>     "last_name" => "C.",
       ...>     "uid" => 358,
-      ...>     "user_link" => "http://path/to/comment/user",
       ...>     "user_name" => "george"
       ...>   }
       ...> },
@@ -107,7 +106,7 @@ defmodule Slacktapped.Comments do
         "color" => "#FFCF0B",
         "fallback" => "George C. commented on nicksergeant's checkin.",
         "mrkdwn_in" => ["text"],
-        "text" => "<http://path/to/comment/user|George C.> commented on " <>
+        "text" => "George C. commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|nicksergeant's " <>
           "checkin> of <https://untappd.com/b/two-lake-ipa/123|IPA> and " <>
           "said:\n>Great beer!"
@@ -141,7 +140,7 @@ defmodule Slacktapped.Comments do
         "color" => "#FFCF0B",
         "fallback" => "nicksergeant commented on nicksergeant's checkin.",
         "mrkdwn_in" => ["text"],
-        "text" => "<|nicksergeant> commented on " <>
+        "text" => "nicksergeant commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|their " <>
           "checkin> of <https://untappd.com/b/two-lake-ipa/123|IPA> and " <>
           "said:\n>I loved this!"
@@ -154,16 +153,15 @@ defmodule Slacktapped.Comments do
     checkin_user_id = checkin["user"]["uid"]
     comment_text = comment["comment"]
     comment_user_id = comment["user"]["uid"]
-    comment_user_link = comment["user"]["user_link"]
     comment_user_name = Slacktapped.Utils.parse_name(comment["user"])
 
     text = cond do
       checkin_user_id == comment_user_id ->
-        "<#{comment_user_link}|#{comment_user_name}> commented on " <>
+        "#{comment_user_name} commented on " <>
         "<#{c.checkin_url}|their checkin> of " <>
         "#{c.beer} and said:\n>#{comment_text}"
       true ->
-        "<#{comment_user_link}|#{comment_user_name}> commented on " <>
+        "#{comment_user_name} commented on " <>
         "<#{c.checkin_url}|#{c.user_name}'s checkin> of " <>
         "#{c.beer} and said:\n>#{comment_text}"
     end
