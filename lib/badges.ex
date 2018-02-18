@@ -95,8 +95,7 @@ defmodule Slacktapped.Badges do
       ...>   },
       ...>   "beer" => %{
       ...>     "bid" => 123,
-      ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa"
+      ...>     "beer_name" => "IPA"
       ...>   },
       ...>   "checkin_id" => 567
       ...> })
@@ -112,7 +111,7 @@ defmodule Slacktapped.Badges do
           "<https://untappd.com/user/nicksergeant/badges/3593|" <>
           "Hopped Up (Level 18)> for " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|their checkin> " <>
-          "of <https://untappd.com/b/two-lake-ipa/123|IPA>.",
+          "of <https://untappd.com/beer/123|IPA>.",
         "title" => "Hopped Up (Level 18)",
         "title_link" => "https://untappd.com/user/nicksergeant/badges/3593"
       }

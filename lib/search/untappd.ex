@@ -33,7 +33,7 @@ defmodule Slacktapped.Search.Untappd do
               "image_url" => "https://untappd.akamaized.net/site/beer_logos/beer-3952_a5c9d_sm.jpeg",
               "text" => "IPA - American, 6% ABV\nAverage rating: 3.898",
               "title" => "60 Minute IPA",
-              "title_link" => "https://untappd.com/b/dogfish-head-craft-brewery-60-minute-ipa/3952"
+              "title_link" => "https://untappd.com/beer/3952"
             }
           ],
           "icon_url" => "https://slacktapped.s3.amazonaws.com/icon.jpg",

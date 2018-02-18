@@ -84,10 +84,10 @@ defmodule Slacktapped do
               "image_url" => nil,
               "mrkdwn_in" => ["text"],
               "text" => "<https://untappd.com/user/|> is drinking " <>
-                "<https://untappd.com/b//|> (, % ABV).\n" <>
+                "<https://untappd.com/beer/|> (, % ABV).\n" <>
                 "<https://untappd.com/user//checkin/|Toast »>",
               "title" => nil,
-              "title_link" => "https://untappd.com/b//"
+              "title_link" => "https://untappd.com/beer/"
             }
           ]
         }
@@ -118,7 +118,7 @@ defmodule Slacktapped do
   Determines if a checkin is eligible to be processed.
 
   Checkin is ineligible if:
-  
+
   1. The checkin_comment contains the text "#shh".
   2. There is no beer (sad).
 

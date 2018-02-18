@@ -97,8 +97,7 @@ defmodule Slacktapped.Comments do
       ...>   },
       ...>   "beer" => %{
       ...>     "bid" => 123,
-      ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa"
+      ...>     "beer_name" => "IPA"
       ...>   },
       ...>   "checkin_id" => 567
       ...> })
@@ -108,7 +107,7 @@ defmodule Slacktapped.Comments do
         "mrkdwn_in" => ["text"],
         "text" => "George C. commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|nicksergeant's " <>
-          "checkin> of <https://untappd.com/b/two-lake-ipa/123|IPA> and " <>
+          "checkin> of <https://untappd.com/beer/123|IPA> and " <>
           "said:\n>Great beer!"
       }
 
@@ -131,8 +130,7 @@ defmodule Slacktapped.Comments do
       ...>   },
       ...>   "beer" => %{
       ...>     "bid" => 123,
-      ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa"
+      ...>     "beer_name" => "IPA"
       ...>   },
       ...>   "checkin_id" => 567
       ...> })
@@ -142,7 +140,7 @@ defmodule Slacktapped.Comments do
         "mrkdwn_in" => ["text"],
         "text" => "nicksergeant commented on " <>
           "<https://untappd.com/user/nicksergeant/checkin/567|their " <>
-          "checkin> of <https://untappd.com/b/two-lake-ipa/123|IPA> and " <>
+          "checkin> of <https://untappd.com/beer/123|IPA> and " <>
           "said:\n>I loved this!"
       }
 

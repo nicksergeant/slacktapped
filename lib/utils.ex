@@ -35,7 +35,6 @@ defmodule Slacktapped.Utils do
       ...>     "beer_abv" => 4.5,
       ...>     "beer_label" => "http://path/to/beer/label",
       ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa",
       ...>     "beer_style" => "American IPA"
       ...>   },
       ...>   "brewery" => %{
@@ -48,14 +47,13 @@ defmodule Slacktapped.Utils do
       ...>   "rating_score" => 3.5
       ...> })
       %{
-        beer: "<https://untappd.com/b/two-lake-ipa/123|IPA>",
+        beer: "<https://untappd.com/beer/123|IPA>",
         beer_abv: 4.5,
         beer_id: 123,
         beer_label: "http://path/to/beer/label",
         beer_name: "IPA",
-        beer_slug: "two-lake-ipa",
         beer_style: "American IPA",
-        beer_url: "https://untappd.com/b/two-lake-ipa/123",
+        beer_url: "https://untappd.com/beer/123",
         brewery: "<https://untappd.com/brewery/1|Two Lake>",
         brewery_id: 1,
         brewery_label: "http://path/to/brewery/label",
@@ -80,7 +78,6 @@ defmodule Slacktapped.Utils do
       beer_id: checkin["beer"]["bid"],
       beer_label: checkin["beer"]["beer_label"],
       beer_name: checkin["beer"]["beer_name"],
-      beer_slug: checkin["beer"]["beer_slug"],
       beer_style: checkin["beer"]["beer_style"],
       brewery_id: checkin["brewery"]["brewery_id"],
       brewery_label: checkin["brewery"]["brewery_label"],
@@ -95,7 +92,7 @@ defmodule Slacktapped.Utils do
     }
 
     c = Map.merge(c, %{
-      beer_url: "https://untappd.com/b/#{c.beer_slug}/#{c.beer_id}",
+      beer_url: "https://untappd.com/beer/#{c.beer_id}",
       brewery_url: "https://untappd.com/brewery/#{c.brewery_id}",
       checkin_url: "https://untappd.com/user/#{c.user_username}/checkin/" <>
         "#{c.checkin_id}",

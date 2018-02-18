@@ -115,7 +115,6 @@ defmodule Slacktapped.Checkins do
       ...>     "beer_abv" => 4.5,
       ...>     "beer_label" => "http://path/to/beer/label",
       ...>     "beer_name" => "IPA",
-      ...>     "beer_slug" => "two-lake-ipa",
       ...>     "beer_style" => "American IPA"
       ...>   },
       ...>   "brewery" => %{
@@ -140,12 +139,12 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/nicksergeant|nicksergeant> is drinking " <>
-            "<https://untappd.com/b/two-lake-ipa/123|IPA> " <>
+            "<https://untappd.com/beer/123|IPA> " <>
             "(American IPA, 4.5% ABV)." <>
             "\nThey rated it a 3.5 and said:\n>Lovely!\n" <>
             "<https://untappd.com/user/nicksergeant/checkin/567|Toast »>",
           "title" => "IPA",
-          "title_link" => "https://untappd.com/b/two-lake-ipa/123"
+          "title_link" => "https://untappd.com/beer/123"
         }
       }
 
@@ -168,11 +167,11 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV)." <>
+            "<https://untappd.com/beer/|> (, % ABV)." <>
             "\nThey said:\n>Lovely!\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -192,11 +191,11 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV)." <>
+            "<https://untappd.com/beer/|> (, % ABV)." <>
             "\nThey rated it a 1.5.\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -216,10 +215,10 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV).\n" <>
+            "<https://untappd.com/beer/|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -239,10 +238,10 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV).\n" <>
+            "<https://untappd.com/beer/|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -265,11 +264,11 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV)." <>
+            "<https://untappd.com/beer/|> (, % ABV)." <>
             "\nThey said:\n>Yuck.\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -300,10 +299,10 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV).\n" <>
+            "<https://untappd.com/beer/|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -330,11 +329,11 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV) " <>
+            "<https://untappd.com/beer/|> (, % ABV) " <>
             "at <https://untappd.com/v/venue-slug/789|Venue Name>.\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -366,7 +365,7 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -391,10 +390,10 @@ defmodule Slacktapped.Checkins do
           "mrkdwn_in" => ["text"],
           "text" => "" <>
             "<https://untappd.com/user/|> is drinking " <>
-            "<https://untappd.com/b//|> (, % ABV).\n" <>
+            "<https://untappd.com/beer/|> (, % ABV).\n" <>
             "<https://untappd.com/user//checkin/|Toast »>",
           "title" => nil,
-          "title_link" => "https://untappd.com/b//"
+          "title_link" => "https://untappd.com/beer/"
         }
       }
 
@@ -402,11 +401,13 @@ defmodule Slacktapped.Checkins do
   def parse_checkin(checkin) do
     c = Slacktapped.Utils.checkin_parts(checkin)
 
+    IO.inspect c.checkin_comment
+
     rating_and_comment = cond do
       is_binary(c.checkin_comment)
         and c.checkin_comment != ""
         and c.checkin_rating > 0
-        and is_number(c.checkin_rating) -> 
+        and is_number(c.checkin_rating) ->
           "\nThey rated it a #{c.checkin_rating} and said:\n>#{c.checkin_comment}"
       is_binary(c.checkin_comment)
         and c.checkin_comment != "" ->
@@ -471,10 +472,10 @@ defmodule Slacktapped.Checkins do
   record exists for the checkin with an image, the checkin is not posted again.
 
   ## Examples
-  
+
       iex> Slacktapped.Checkins.report_checkin_type({:ok, %{}})
       {:ok, %{"reported_as" => "without-image"}}
-  
+
       iex> Slacktapped.Checkins.report_checkin_type({:ok, %{
       ...>   "media" => %{
       ...>     "items" => [
