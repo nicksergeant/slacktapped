@@ -8,8 +8,8 @@
 
 set -e
 
-export ERLANG_VERSION="19.0"
-export ELIXIR_VERSION="v1.3.2"
+export ERLANG_VERSION="20.0"
+export ELIXIR_VERSION="v1.6.1"
 
 # If you have a elixir_buildpack.config, do this instead:
 #export ERLANG_VERSION=$(cat elixir_buildpack.config | grep erlang_version | tr "=" " " | awk '{ print $2 }')
@@ -67,7 +67,7 @@ fi
 # 1) add the code below
 # 2) run the Elm build like this " ~/dependencies/sysconfcpus/bin/sysconfcpus -n 2 node_modules/brunch/bin/brunch build"
 # 3) your Elm builds will finish in seconds instead of minutes
-# 
+#
 # For more info see: https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
 #if [ ! -d $INSTALL_PATH/sysconfcpus/bin ]; then
 #  git clone https://github.com/obmarg/libsysconfcpus.git
