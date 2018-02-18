@@ -401,8 +401,6 @@ defmodule Slacktapped.Checkins do
   def parse_checkin(checkin) do
     c = Slacktapped.Utils.checkin_parts(checkin)
 
-    IO.inspect c.checkin_comment
-
     rating_and_comment = cond do
       is_binary(c.checkin_comment)
         and c.checkin_comment != ""
