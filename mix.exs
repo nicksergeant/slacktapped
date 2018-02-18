@@ -9,7 +9,7 @@ defmodule Slacktapped.Mixfile do
       docs: [extras: [
         "README.md": [path: "readme", title: "Readme"]
       ]],
-      elixir: "~> 1.3",
+      elixir: "~> 1.6",
       homepage_url: "http://slacktapped.com",
       name: "Slacktapped",
       source_url: "https://github.com/nicksergeant/slacktapped",
