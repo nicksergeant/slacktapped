@@ -45,15 +45,19 @@ defmodule Slacktapped do
   """
   def main do
     Logger.info("[Processor] Running...")
-    @untappd.get("checkin/recent")
+    
+    res = @untappd.get("checkin/recent")
       |> Map.fetch!(:body)
       |> Poison.decode!
-      |> get_in(["response", "checkins", "items"])
-      |> Enum.map(&(handle_checkin(&1)))
-      |> Enum.reduce([], fn({_ok, checkin}, acc) ->
-          acc ++ checkin["attachments"]
-        end)
-      |> @slack.post
+
+    Logger.info("[Processor] The result is: #{inspect res}")
+
+    # |> get_in(["response", "checkins", "items"])
+    # |> Enum.map(&(handle_checkin(&1)))
+    # |> Enum.reduce([], fn({_ok, checkin}, acc) ->
+    #     acc ++ checkin["attachments"]
+    #   end)
+    # |> @slack.post
     Logger.info("[Processor] Done.")
   end
 
