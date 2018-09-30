@@ -1,8 +1,9 @@
 use Mix.Config
 
-config :quantum, cron: [
-  "* * * * *": {Slacktapped, :main}
-]
+config :slacktapped, Slacktapped.Scheduler,
+  jobs: [
+    {"* * * * *",      {Slacktapped, :main, []}},
+  ]
 
 config :slacktapped,
   beersearch: Slacktapped.BeerSearch.Live,

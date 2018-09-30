@@ -23,12 +23,15 @@ defmodule Slacktapped do
       worker(Redix, [
         redis_url,
         [name: :redix]
-      ])
+      ]),
+      worker(Slacktapped.Scheduler, [])
     ]
 
     Logger.info("[Server] Started")
 
-    Supervisor.start_link(children, strategy: :one_for_one)
+    opts = [strategy: :one_for_one, name: Slacktapped.Supervisor]
+
+    Supervisor.start_link(children, opts)
   end
 
   @doc """
