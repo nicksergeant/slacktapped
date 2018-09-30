@@ -45,7 +45,7 @@ defmodule Slacktapped do
     @untappd.get("checkin/recent")
       |> Map.fetch!(:body)
       |> Poison.decode!
-      |> get_in(["response", "checkins", "items"])
+      |> get_in([:response, :checkins, :items])
       |> Enum.map(&(handle_checkin(&1)))
       |> Enum.reduce([], fn({_ok, checkin}, acc) ->
           acc ++ checkin["attachments"]
