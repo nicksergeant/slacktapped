@@ -35,10 +35,10 @@ defmodule Slacktapped.Mixfile do
 
   defp deps do
     [
-      {:beersearch, "~> 0.0.8"},
+      {:beersearch, "~> 0.0.9"},
       {:cowboy, "~> 2.7.0"},
       {:ex_doc, "~> 0.12", only: :dev},
-      {:httpotion, "~> 3.0.0"},
+      {:httpotion, "~> 3.1.0"},
       {:mix_test_watch, "~> 0.2", only: :dev},
       {:plug, "~> 1.10"},
       {:plug_cowboy, "~> 2.2.1"},
