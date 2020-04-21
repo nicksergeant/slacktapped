@@ -19,7 +19,7 @@ defmodule Slacktapped do
     redis_url = System.get_env("REDIS_URL") || "redis://localhost:6379"
 
     children = [
-      Plug.Adapters.Cowboy.http(Slacktapped.Router, port: cowboy_port),
+      { Plug.Cowboy, scheme: :http, plug: Slacktapped.Router, port: cowboy_port },
       worker(Redix, [
         redis_url,
         [name: :redix]
