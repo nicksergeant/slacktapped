@@ -40,7 +40,7 @@ Online documentation is available at [slacktapped.com](http://slacktapped.com).
 ## Deployment
 
 1. Do a `git push` to Heroku or your Dokku server.
-2. `heroku buildpacks:set elixir-buildpack/heroku-elixir`
+2. `heroku buildpacks:set hashnuke/elixir`
 3. Set your environment variables:
 
 ```
