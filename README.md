@@ -40,7 +40,8 @@ Online documentation is available at [slacktapped.com](http://slacktapped.com).
 ## Deployment
 
 1. Do a `git push` to Heroku or your Dokku server.
-2. Set your environment variables:
+2. `heroku buildpacks:set elixir-buildpack/heroku-elixir`
+3. Set your environment variables:
 
 ```
 INSTANCE_NAME=''         # Unique name for this Slacktapped instance.
